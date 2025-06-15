@@ -1,0 +1,57 @@
+﻿@inject BudgetsService BudgetsService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudDialog>
+
+    <TitleContent>
+        Create Budget
+    </TitleContent>
+
+    <DialogContent>
+        <MudStack Row>
+            <MudAutocomplete @bind-Value="_month" SearchFunc="@SearchMonths" ToStringFunc="@(value => value.ToMonthName())" Required="true" 
+                             MaxItems="null" Clearable="true" Label="Month" Variant="Variant.Filled" ResetValueOnEmptyText="true" />
+            <MudNumericField @bind-Value="_year" Required="true" Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" />
+        </MudStack>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="@SubmitAsync" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary" Variant="Variant.Filled">Create</MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public required IEnumerable<string> ExistingBudgetNames { get; set; }
+
+    private int _month = DateTime.Today.Month;
+    private int _year = DateTime.Today.Year;
+    private readonly IEnumerable<int> _months = Enumerable.Range(1, 12);
+
+    private Task<IEnumerable<int>> SearchMonths(string value, CancellationToken token)
+    {
+        return Task.FromResult(string.IsNullOrWhiteSpace(value)
+            ? _months
+            : _months.Where(x => x.ToMonthName().Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
+    private async Task SubmitAsync()
+    {
+        var newBudget = new Budget(_month, _year);
+
+        if (ExistingBudgetNames.Contains(newBudget.Name))
+        {
+            Snackbar.Add("Budget already exists.", Severity.Warning);
+            return;
+        }
+
+        await BudgetsService.UpsertBudgetAsync(newBudget);
+        
+        NavigationManager.NavigateTo($"/budgets/{newBudget.Name}");
+    }
+}

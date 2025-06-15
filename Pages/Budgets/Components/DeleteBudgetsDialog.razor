@@ -1,0 +1,36 @@
+﻿@inject BudgetsService BudgetsService
+@inject NavigationManager NavigationManager
+
+<MudDialog>
+
+    <TitleContent>
+        Delete Budget
+    </TitleContent>
+
+    <DialogContent>
+        Are you sure you want to delete the following budget(s): @(string.Join(", ", BudgetNamesToDelete))?
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="@SubmitAsync" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Error" Variant="Variant.Filled">Delete</MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+
+    [Parameter]
+    public required IEnumerable<string> BudgetNamesToDelete { get; set; }
+
+    private async Task SubmitAsync()
+    {
+        await Task.WhenAll(BudgetNamesToDelete.Select(budgetName => BudgetsService.DeleteBudgetAsync(budgetName)));
+        
+        // foreach(var budgetName in BudgetNamesToDelete)
+        //     await BudgetsService.DeleteBudgetAsync(budgetName);
+        
+        NavigationManager.NavigateTo("/budgets", true);
+    }
+}

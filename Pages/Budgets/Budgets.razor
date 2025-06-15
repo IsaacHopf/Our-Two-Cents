@@ -1,0 +1,82 @@
+﻿@inject BudgetsService BudgetsService
+@inject IDialogService DialogService
+@using BudgetApp.Pages.Budgets.Components
+
+@page "/budgets"
+
+<MudStack Row Spacing="6" AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.Middle" Class="mb-6" >
+    <MudFab OnClick="@OpenCreateDialog" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large"/>
+    <MudNumericField T="int?" Value="@_year" ValueChanged="@YearValueChangedHandler" Immediate="true" DebounceInterval="250"
+                     Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" Clearable="true"/>
+    @if (_showDelete)
+    {
+        <MudFab OnClick="@OpenDeleteDialog" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Large"/>
+    }
+</MudStack>
+
+<MudList T="string">
+    <MudDivider />
+    @foreach (var item in _budgetNameItems)
+    {
+        <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
+            <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
+            <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
+                         Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
+        </MudStack>
+        <MudDivider />
+    }
+</MudList>
+
+@code {
+    private int? _year = DateTime.Today.Year;
+    /// <remarks>Must be a list. Otherwise, the checkboxes don't update.</remarks>
+    private List<BudgetNameItem> _budgetNameItems = [];
+    private bool _showDelete = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await SetBudgetNameItemsAsync();
+    }
+
+    private async Task SetBudgetNameItemsAsync()
+    {
+        _budgetNameItems = _year is null
+            ? (await BudgetsService.GetBudgetsAsync()).OrderByDateDescending().Select(x => new BudgetNameItem(x.Name)).ToList()
+            : (await BudgetsService.GetBudgetsAsync((int)_year)).OrderByDateDescending().Select(x => new BudgetNameItem(x.Name)).ToList();
+    }
+
+    private async Task YearValueChangedHandler(int? year)
+    {
+        _year = year;
+        await SetBudgetNameItemsAsync();
+        _showDelete = false;
+    }
+
+    private void IsSelectedValueChangedHandler(BudgetNameItem item, bool isSelected)
+    {
+        item.IsSelected = isSelected;
+        _showDelete = _budgetNameItems.Any(x => x.IsSelected);
+    }
+
+    private Task OpenCreateDialog()
+    {
+        var existingBudgetNames = _budgetNameItems.Select(x => x.Name);
+        var parameters = new DialogParameters<CreateBudgetDialog> { { x => x.ExistingBudgetNames, existingBudgetNames } };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, Position = DialogPosition.TopCenter };
+        return DialogService.ShowAsync<CreateBudgetDialog>("Create Budget", parameters, options);
+    }
+
+    private Task OpenDeleteDialog()
+    {
+        var budgetNamesToDelete = _budgetNameItems.Where(x => x.IsSelected).Select(x => x.Name);
+        var parameters = new DialogParameters<DeleteBudgetsDialog> { { x => x.BudgetNamesToDelete, budgetNamesToDelete } };
+        var options = new DialogOptions { CloseOnEscapeKey = true, CloseButton = true, Position = DialogPosition.TopCenter };
+        return DialogService.ShowAsync<DeleteBudgetsDialog>("Delete Budgets", parameters, options);
+    }
+
+    public class BudgetNameItem(string name)
+    {
+        public string Name { get; set; } = name;
+        public bool IsSelected { get; set; } = false;
+    }
+}

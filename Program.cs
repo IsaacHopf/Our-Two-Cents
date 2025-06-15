@@ -1,3 +1,7 @@
+using System.Text.Json;
+using BudgetApp.Services;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using Photino.Blazor;
@@ -9,20 +13,32 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(args);
+        var builder = PhotinoBlazorAppBuilder.CreateDefault(args);
+        
+        builder.Services.AddMudServices();
 
-        appBuilder.Services.AddLogging();
-        appBuilder.Services.AddMudServices();
+        var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
+        var cosmosClient = new CosmosClient(
+            config.GetValue<string>("CosmosEndpoint"), 
+            config.GetValue<string>("CosmosAuthKey"),
+            new CosmosClientOptions
+            {
+                UseSystemTextJsonSerializerWithOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                }
+            });
+        builder.Services.AddSingleton(new BudgetsService(cosmosClient));
 
-        appBuilder.RootComponents.Add<App>("#app");
+        builder.RootComponents.Add<App>("#app");
 
-        var app = appBuilder.Build();
+        var app = builder.Build();
 
         app.MainWindow
             .SetSize(1400, 800)
             .SetDevToolsEnabled(true)
             .SetLogVerbosity(0)
-            //.SetIconFile("favicon.ico")
+            .SetIconFile("favicon.ico")
             .SetTitle("Our Two Cents");
 
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>

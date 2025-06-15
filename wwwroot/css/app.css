@@ -30,3 +30,11 @@
 }
 
 /* endregion */
+
+/* region General */
+
+a:hover {
+    color: inherit;
+}
+
+/* endregion */
