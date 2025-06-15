@@ -1,0 +1,81 @@
+﻿@inject BudgetsService BudgetService
+@using System.Collections.ObjectModel
+@using BudgetApp.Pages.Budgets.Components
+
+@page "/budgets/{budgetName}"
+
+<MudStack Row="true" Spacing="6">
+    <ReadOnlyCurrencyTextField Value="@_budget?.TotalIncome" Label="Total Income"/>
+    <ReadOnlyCurrencyTextField Value="@(_budget?.TotalExpenses * -1)" Label="Total Expenses"/>
+    <ReadOnlyCurrencyTextField Value="@_budget?.Net" Label="Net"/>
+</MudStack>
+
+<MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="40px">
+    <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
+        <MudDataGrid Items="@_incomes" Hover="true" Bordered="true" Dense="true" Elevation="0" Class="ps-6 pe-6 pb-6 pt-2 w-100">
+            <ToolBarContent>
+                <MudTooltip Text="Add Income" Delay="650">
+                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success" Style="background-color: var(--mud-palette-success-lighten);"/>
+                </MudTooltip>
+                <MudTooltip Text="Add Fixed Income" Delay="650">
+                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success" Style="background-color: var(--mud-palette-success-lighten);"/>
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.Source"/>
+                <PropertyColumn Property="x => x.Amount"/>
+                <PropertyColumn Property="x => x.Date"/>
+            </Columns>
+        </MudDataGrid>
+    </MudTabPanel>
+    <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
+        <MudDataGrid Items="@_expenses" Hover="true" Bordered="true" Dense="true" Elevation="0" Class="ps-6 pe-6 pb-6 pt-2 w-100">
+            <ToolBarContent>
+                <MudTooltip Text="Add Expense" Delay="650">
+                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error" Style="background-color: var(--mud-palette-error-lighten);"/>
+                </MudTooltip>
+                <MudTooltip Text="Add Fixed Expenses" Delay="650">
+                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error" Style="background-color: var(--mud-palette-error-lighten);"/>
+                </MudTooltip>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.Source"/>
+                <PropertyColumn Property="x => x.Amount"/>
+                <PropertyColumn Property="x => x.Type"/>
+                <PropertyColumn Property="x => x.Date"/>
+            </Columns>
+        </MudDataGrid>
+    </MudTabPanel>
+    <MudTabPanel Text="Charts" Icon="@Icons.Material.Rounded.PieChartOutline">
+        <MudText>Content One</MudText>
+    </MudTabPanel>
+    <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
+        <MudText>Content One</MudText>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter] public required string BudgetName { get; set; }
+
+    private Budget? _budget;
+    private ObservableCollection<Income> _incomes = [];
+    private decimal _totalIncome = 0;
+    private ObservableCollection<Expense> _expenses = [];
+    private decimal _totalExpenses = 0;
+    private decimal _net = 0;
+    private string? _notes;
+    private bool _isBudgetChanged = false;
+    private bool _isTotalExpensesByTypeChartExpanded = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _budget = await BudgetService.GetBudgetAsync(BudgetName);
+        _incomes = new ObservableCollection<Income>(_budget.Incomes);
+        _expenses = new ObservableCollection<Expense>(_budget.Expenses);
+        _notes = _budget.Notes;
+
+        // Used for saving on ctrl+s.
+        // await InvokeJavaScriptFunctionWithCallbackAsync(
+        //     this, "executeCallbackOnCtrlS", nameof(SaveBudget));
+    }
+}

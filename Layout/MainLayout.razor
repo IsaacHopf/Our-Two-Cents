@@ -26,7 +26,7 @@
     </MudAppBar>
     
     <MudMainContent>
-        <div class="p-4">
+        <div class="pa-6">
             <ErrorBoundary @ref="@_errorBoundary">
                 <ChildContent>
                     @Body
@@ -77,14 +77,17 @@
         {
             Primary = Colors.Blue.Darken3,
             Secondary = Colors.Blue.Darken4,
-            Tertiary = Colors.Shades.White
+            Tertiary = Colors.Shades.White,
+            Surface = Colors.BlueGray.Lighten5,
+            Success = Colors.Green.Default,
+            Error = Colors.Red.Default
         },
         PaletteDark = new PaletteDark
         {
-            Primary = Colors.Blue.Darken2,
-            Secondary = Colors.Blue.Darken4,
+            Primary = Colors.Blue.Darken1,
+            Secondary = Colors.Blue.Darken3,
             Tertiary = Colors.Shades.White,
-            Background = Colors.BlueGray.Darken1,
+            Background = Colors.BlueGray.Default,
             Surface = Colors.BlueGray.Darken1,
             TextPrimary = Colors.Gray.Lighten4
         }

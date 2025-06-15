@@ -1,0 +1,29 @@
+﻿<MudTextField Value="@Value" Label="@Label" ReadOnly="true" Variant="Variant.Filled" 
+              Adornment="Adornment.Start" AdornmentIcon="@_icon" AdornmentColor="@_iconColor" />
+
+@code {
+    [Parameter] public decimal? Value { get; set; }
+    [Parameter] public string? Label { get; set; }
+
+    private string _icon = Icons.Material.Rounded.AttachMoney;
+    private Color _iconColor = Color.Success;
+    
+    protected override void OnParametersSet()
+    {
+        switch (Value)
+        {
+            case > 0:
+                _icon = Icons.Material.Rounded.AttachMoney;
+                _iconColor = Color.Success;
+                break;
+            case < 0:
+                _icon = Icons.Material.Rounded.MoneyOff;
+                _iconColor = Color.Error;
+                break;
+            default:
+                _icon = Icons.Material.Rounded.AttachMoney;
+                _iconColor = Color.Surface;
+                break;
+        }
+    }
+}
