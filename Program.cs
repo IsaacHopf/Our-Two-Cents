@@ -18,9 +18,7 @@ public class Program
         builder.Services.AddMudServices();
 
         var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
-        var cosmosClient = new CosmosClient(
-            config.GetValue<string>("CosmosEndpoint"), 
-            config.GetValue<string>("CosmosAuthKey"),
+        var cosmosClient = new CosmosClient(config.GetSection("CosmosConnectionString").Value,
             new CosmosClientOptions
             {
                 UseSystemTextJsonSerializerWithOptions = new JsonSerializerOptions
@@ -28,7 +26,7 @@ public class Program
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
             });
-        builder.Services.AddSingleton(new BudgetsService(cosmosClient));
+        builder.Services.AddSingleton(new BudgetsService(cosmosClient, config));
 
         builder.RootComponents.Add<App>("#app");
 

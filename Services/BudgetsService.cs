@@ -1,15 +1,16 @@
 ﻿using BudgetApp.Services.Entities;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 
 namespace BudgetApp.Services;
 
-public class BudgetsService(CosmosClient cosmosClient)
+public class BudgetsService(CosmosClient cosmosClient, IConfiguration config)
 {
-    private const string DatabaseName = "BudgetApp";
-    private const string ContainerName = "Budgets";
     private const string FixedBudgetName = "January 1";
 
-    private readonly Container _container = cosmosClient.GetContainer(DatabaseName, ContainerName);
+    private readonly Container _container = cosmosClient.GetContainer(
+        config.GetSection("DatabaseName").Value!,
+        config.GetSection("BudgetsContainerName").Value!);
 
     public async Task<Budget> GetBudgetAsync(string budgetName) =>
         await _container.ReadItemAsync<Budget>(budgetName, new PartitionKey(budgetName));
