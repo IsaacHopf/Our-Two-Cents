@@ -4,13 +4,18 @@
 
 @page "/budgets"
 
-<MudStack Row Spacing="6" AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.Middle" Class="mb-6" >
-    <MudFab OnClick="@OpenCreateDialog" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large"/>
+<MudStack Row Spacing="6" AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.Middle" Class="mb-6">
+    
+    <MudTooltip Text="Create Budget" Delay="650">
+        <MudFab OnClick="@OpenCreateDialog" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large"/>
+    </MudTooltip>
     <MudNumericField T="int?" Value="@_year" ValueChanged="@YearValueChangedHandler" Immediate="true" DebounceInterval="250"
                      Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" Clearable="true"/>
     @if (_showDelete)
     {
-        <MudFab OnClick="@OpenDeleteDialog" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Large"/>
+        <MudTooltip Text="Delete Budgets" Delay="650">
+            <MudFab OnClick="@OpenDeleteDialog" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Large"/>
+        </MudTooltip>
     }
 </MudStack>
 

@@ -3,6 +3,7 @@ using BudgetApp.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
 
@@ -15,7 +16,16 @@ public class Program
     {
         var builder = PhotinoBlazorAppBuilder.CreateDefault(args);
         
-        builder.Services.AddMudServices();
+        builder.Services.AddMudServices(config =>
+        {
+            config.SnackbarConfiguration.VisibleStateDuration = 2000;
+            config.SnackbarConfiguration.HideTransitionDuration = 200;
+            config.SnackbarConfiguration.ShowTransitionDuration = 200;
+            config.SnackbarConfiguration.PreventDuplicates = false;
+            config.SnackbarConfiguration.ShowCloseIcon = false;
+            config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            config.SnackbarConfiguration.MaximumOpacity = 255;
+        });
 
         var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
         var cosmosClient = new CosmosClient(config.GetSection("CosmosConnectionString").Value,
@@ -33,7 +43,7 @@ public class Program
         var app = builder.Build();
 
         app.MainWindow
-            .SetSize(1400, 800)
+            .SetMaximized(true)
             .SetDevToolsEnabled(true)
             .SetLogVerbosity(0)
             .SetIconFile("favicon.ico")

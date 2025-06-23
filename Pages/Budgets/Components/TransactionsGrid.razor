@@ -1,0 +1,187 @@
+﻿@implements IAsyncDisposable
+@inherits JSInteropComponent<TransactionsGrid>
+@inject IScrollManager ScrollManager
+@inject ISnackbar Snackbar
+@using System.Collections.ObjectModel
+
+<MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
+             ReadOnly="@(!Editable)" EditMode="DataGridEditMode.Cell"
+             Hover="true" Bordered="true" Dense="true" Elevation="0" Class="mud-datagrid-edit-onclick ps-6 pe-6 pb-6 pt-2 w-100">
+    
+    <ToolBarContent>
+        @if (Income)
+        {
+            <MudTooltip Text="Add Income" Delay="650">
+                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success"
+                        Class="me-4" Style="background-color: var(--mud-palette-success-lighten);"/>
+            </MudTooltip>
+            <MudTooltip Text="Add Fixed Income" Delay="650">
+                <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"
+                        Class="me-4" Style="background-color: var(--mud-palette-success-lighten);"/>
+            </MudTooltip>
+        }
+        else
+        {
+            <MudTooltip Text="Add Expense" Delay="650">
+                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error"
+                        Class="me-4" Style="background-color: var(--mud-palette-error-lighten);"/>
+            </MudTooltip>
+            <MudTooltip Text="Add Fixed Expenses" Delay="650">
+                <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"
+                        Class="me-4" Style="background-color: var(--mud-palette-error-lighten);"/>
+            </MudTooltip>
+        }
+    </ToolBarContent>
+    
+    <Columns>
+        <PropertyColumn Property="x => x.Source"/>
+        <PropertyColumn Property="x => x.Amount" Format="C">
+            <EditTemplate>
+                <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
+                                 ValueChanged="x => { context.Item.Amount = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); }"/>
+            </EditTemplate>
+        </PropertyColumn>
+        @if (!Income)
+        {
+            <PropertyColumn Property="x => x.Type">
+                @*<CellTemplate>
+                    <MudChip T="string" Size="Size.Small" Class="ma-0" Style="@($"background-color: {@context.Item.Type.Color};")">
+                        <MudText style="font-size: .875rem;">@context.Item.Type.Name</MudText>
+                    </MudChip>
+                </CellTemplate>
+                <EditTemplate>
+                    <MudAutocomplete T="string" Value="context.Item.Type.Name"
+                                     ValueChanged="async x => { context.Item.Type = ExpenseType.FromString(x);
+                                         await _gridRef!.TransactionChanged(context.Item); }"
+                                     SearchFunc="@GetExpenseTypes" SelectValueOnTab Required Clearable>
+                        <ItemTemplate Context="e">
+                            <MudText Class="mud-datagrid-edit-onclick" Style="font-size: .875rem;">@e</MudText>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </EditTemplate>*@
+            </PropertyColumn>
+        }
+        <PropertyColumn Property="x => x.Date" Format="MMM. d">
+            <EditTemplate>
+                <MudNumericField T="int?" Min="1" Value="context.Item.Date?.Day"
+                                 ValueChanged="x => 
+                                 { 
+                                     try 
+                                     { 
+                                         context.Item.Date = x is null ? null : new DateTime(Year, Month, x.Value); 
+                                         _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
+                                     }
+                                     catch (ArgumentOutOfRangeException) 
+                                     { 
+                                         context.Item.Date = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
+                                     } 
+                                 }"/>
+            </EditTemplate>
+        </PropertyColumn>
+    </Columns>
+    
+</MudDataGrid>
+
+@code {
+    /// <summary>Indicates whether the transactions are income or expenses.</summary>
+    [Parameter] public bool Income { get; set; } = true;
+    [Parameter] public required int Year { get; set; }
+    [Parameter] public required int Month { get; set; }
+    [Parameter] public required ObservableCollection<Transaction> Transactions { get; set; }
+    [Parameter] public required IEnumerable<Transaction> FixedTransactions { get; set; } = [];
+    [Parameter] public EventCallback<Transaction> OnTransactionChanged { get; set; }
+    [Parameter] public EventCallback OnDisableEdit { get; set; }
+    private bool Editable { get; set; } = false;
+
+    private MudDataGrid<Transaction>? _gridRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Used for toggling edit.
+        await InvokeJSFunctionWithCallbackAsync(
+            this, 
+            "executeCallbackOnEditMudDataGridOutsideClick", 
+            nameof(DisableEditAsync));
+
+        // Used for adding new records on enter.
+        await InvokeJSFunctionWithCallbackAsync(
+            this, 
+            "executeCallbackOnEditMudDataGridEnter", 
+            nameof(AddTransactionAsync));
+    }
+
+    /// <summary>
+    /// Transactions are added by pressing the button or pressing enter while focus is on the grid.
+    /// </summary>
+    /// <remarks>
+    /// This functionality uses JSRuntime to work. <see cref="OnInitializedAsync"/>
+    /// invokes a JS function, which is defined in "wwwroot/scripts/keyboard-shortcuts.js"/>.
+    /// </remarks>
+    [JSInvokable]
+    public async Task AddTransactionAsync()
+    {
+        Transactions.Add(new Transaction(0, string.Empty, "Misc."));
+
+        // Needed when adding transactions with "Enter" key.
+        StateHasChanged();
+        
+        EnableEdit();
+        await ScrollToBottomAsync();
+    }
+
+    private async Task AddFixedTransactionsAsync()
+    {
+        if (!FixedTransactions.Any()) return;
+
+        if (!FixedTransactions.Except(Transactions, new TransactionComparer()).Any())
+        {
+            Snackbar.Add($"Fixed {(Income ? "Income" : "Expenses")} already added.", Severity.Info);
+            return;
+        }
+
+        foreach (var transaction in FixedTransactions) Transactions.Add(transaction);
+
+        await OnTransactionChanged.InvokeAsync();
+        
+        EnableEdit();
+        await ScrollToBottomAsync();
+    }
+
+    private void EnableEdit()
+    {
+        Editable = true;
+    }
+    
+    private async Task ScrollToBottomAsync()
+    {
+        await Task.Delay(100);
+        await ScrollManager.ScrollToBottomAsync("main", ScrollBehavior.Smooth);
+    }
+
+    /// <summary>
+    /// Edit is disabled by clicking somewhere outside the grid.
+    /// </summary>
+    /// <remarks>
+    /// This functionality uses JSRuntime to work. <see cref="OnInitializedAsync"/>
+    /// invokes a JS function, which is defined in "wwwroot/scripts/keyboard-shortcuts.js"/>.
+    /// </remarks>
+    [JSInvokable]
+    public async Task DisableEditAsync()
+    {
+        if (Editable)
+        {
+            Editable = false;
+            await OnDisableEdit.InvokeAsync();
+            StateHasChanged();
+        }
+    }
+
+    /// <remarks>
+    /// Disabling edit on dispose ensures that editing is gracefully disabled if the user navigates 
+    /// to a different page or anything else that causes the component to be disposed.
+    /// </remarks>
+    public async ValueTask DisposeAsync()
+    {
+        await DisableEditAsync();
+    }
+}

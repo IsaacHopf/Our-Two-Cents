@@ -8,9 +8,9 @@ public class Budget(int month, int year)
     public string Name { get; } = $"{month.ToMonthName()} {year}";
     public int Month { get; } =  month;
     public int Year { get; } = year;
-    public List<Income> Incomes { get; set; } = [];
+    public List<Transaction> Incomes { get; set; } = [];
     public decimal TotalIncome => Incomes.Sum(i => i.Amount);
-    public List<Expense> Expenses { get; set; } = [];
+    public List<Transaction> Expenses { get; set; } = [];
     public decimal TotalExpenses => Expenses.Sum(e => e.Amount);
     public decimal Net => TotalIncome - TotalExpenses;
     public string? Notes { get; set; }

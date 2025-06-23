@@ -1,6 +1,7 @@
 ﻿@inject BudgetsService BudgetService
-@using System.Collections.ObjectModel
+@inject ISnackbar Snackbar
 @using BudgetApp.Pages.Budgets.Components
+@using System.Collections.ObjectModel
 
 @page "/budgets/{budgetName}"
 
@@ -12,39 +13,20 @@
 
 <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="40px">
     <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
-        <MudDataGrid Items="@_incomes" Hover="true" Bordered="true" Dense="true" Elevation="0" Class="ps-6 pe-6 pb-6 pt-2 w-100">
-            <ToolBarContent>
-                <MudTooltip Text="Add Income" Delay="650">
-                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success" Style="background-color: var(--mud-palette-success-lighten);"/>
-                </MudTooltip>
-                <MudTooltip Text="Add Fixed Income" Delay="650">
-                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success" Style="background-color: var(--mud-palette-success-lighten);"/>
-                </MudTooltip>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.Source"/>
-                <PropertyColumn Property="x => x.Amount"/>
-                <PropertyColumn Property="x => x.Date"/>
-            </Columns>
-        </MudDataGrid>
+        @if (_budget is not null)
+        {
+            <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" 
+                              Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes" 
+                              OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
+        }
     </MudTabPanel>
     <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
-        <MudDataGrid Items="@_expenses" Hover="true" Bordered="true" Dense="true" Elevation="0" Class="ps-6 pe-6 pb-6 pt-2 w-100">
-            <ToolBarContent>
-                <MudTooltip Text="Add Expense" Delay="650">
-                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error" Style="background-color: var(--mud-palette-error-lighten);"/>
-                </MudTooltip>
-                <MudTooltip Text="Add Fixed Expenses" Delay="650">
-                    <MudFab Class="me-4" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error" Style="background-color: var(--mud-palette-error-lighten);"/>
-                </MudTooltip>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.Source"/>
-                <PropertyColumn Property="x => x.Amount"/>
-                <PropertyColumn Property="x => x.Type"/>
-                <PropertyColumn Property="x => x.Date"/>
-            </Columns>
-        </MudDataGrid>
+        @if (_budget is not null)
+        {
+            <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" 
+                              Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses" 
+                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
+        }
     </MudTabPanel>
     <MudTabPanel Text="Charts" Icon="@Icons.Material.Rounded.PieChartOutline">
         <MudText>Content One</MudText>
@@ -58,24 +40,55 @@
     [Parameter] public required string BudgetName { get; set; }
 
     private Budget? _budget;
-    private ObservableCollection<Income> _incomes = [];
-    private decimal _totalIncome = 0;
-    private ObservableCollection<Expense> _expenses = [];
-    private decimal _totalExpenses = 0;
-    private decimal _net = 0;
-    private string? _notes;
-    private bool _isBudgetChanged = false;
-    private bool _isTotalExpensesByTypeChartExpanded = true;
+    private ObservableCollection<Transaction> _incomes = [];
+    private ObservableCollection<Transaction> _expenses = [];
+    private bool _hasBudgetChanged = false;
+    //private bool _isTotalExpensesByTypeChartExpanded = true;
+
+    private Budget? _fixedBudget;
     
     protected override async Task OnInitializedAsync()
     {
         _budget = await BudgetService.GetBudgetAsync(BudgetName);
-        _incomes = new ObservableCollection<Income>(_budget.Incomes);
-        _expenses = new ObservableCollection<Expense>(_budget.Expenses);
-        _notes = _budget.Notes;
+        _incomes = new ObservableCollection<Transaction>(_budget.Incomes);
+        _expenses = new ObservableCollection<Transaction>(_budget.Expenses);
 
-        // Used for saving on ctrl+s.
-        // await InvokeJavaScriptFunctionWithCallbackAsync(
-        //     this, "executeCallbackOnCtrlS", nameof(SaveBudget));
+        _fixedBudget = await BudgetService.GetFixedBudget();
+        _fixedBudget.Incomes.ForEach(transaction =>
+        {
+            transaction.Date = transaction.Date.HasValue 
+                ? new DateTime(_budget.Year, _budget.Month, transaction.Date.Value.Day) : null;
+        });
+        _fixedBudget.Expenses.ForEach(transaction =>
+        {
+            transaction.Date = transaction.Date.HasValue 
+                ? new DateTime(_budget.Year, _budget.Month, transaction.Date.Value.Day) : null;
+        });
+    }
+
+    private void UpdateIncome()
+    {
+        _budget!.Incomes = _incomes.ToList();
+        _hasBudgetChanged = true;
+    }
+
+    private void UpdateExpenses()
+    {
+        _budget!.Expenses = _expenses.ToList();
+        _hasBudgetChanged = true;
+    }
+    
+    private async Task SaveBudgetAsync()
+    {
+        if (!_hasBudgetChanged)
+        {
+            Snackbar.Add("No changes to save.", Severity.Info);
+            return;
+        }
+
+        await BudgetService.UpsertBudgetAsync(_budget!);
+
+        _hasBudgetChanged = false;
+        Snackbar.Add("Budget saved!", Severity.Success);
     }
 }
