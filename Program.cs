@@ -28,7 +28,7 @@ public class Program
         });
 
         var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
-        var cosmosClient = new CosmosClient(config.GetSection("CosmosConnectionString").Value,
+        var cosmosClient = new CosmosClient(config["CosmosConnectionString"],
             new CosmosClientOptions
             {
                 UseSystemTextJsonSerializerWithOptions = new JsonSerializerOptions
