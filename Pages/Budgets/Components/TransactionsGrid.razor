@@ -5,7 +5,7 @@
 @using System.Collections.ObjectModel
 
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-             ReadOnly="@(!Editable)" EditMode="DataGridEditMode.Cell"
+             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell"
              Hover="true" Bordered="true" Dense="true" Elevation="0" Class="mud-datagrid-edit-onclick ps-6 pe-6 pb-6 pt-2 w-100">
     
     <ToolBarContent>
@@ -38,7 +38,10 @@
         <PropertyColumn Property="x => x.Amount" Format="C">
             <EditTemplate>
                 <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
-                                 ValueChanged="x => { context.Item.Amount = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); }"/>
+                                 ValueChanged="x => 
+                                 { 
+                                     context.Item.Amount = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
+                                 }"/>
             </EditTemplate>
         </PropertyColumn>
         @if (!Income)
@@ -78,6 +81,12 @@
                                  }"/>
             </EditTemplate>
         </PropertyColumn>
+        <TemplateColumn>
+            <EditTemplate>
+                <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                               Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+            </EditTemplate>
+        </TemplateColumn>
     </Columns>
     
 </MudDataGrid>
@@ -91,9 +100,9 @@
     [Parameter] public required IEnumerable<Transaction> FixedTransactions { get; set; } = [];
     [Parameter] public EventCallback<Transaction> OnTransactionChanged { get; set; }
     [Parameter] public EventCallback OnDisableEdit { get; set; }
-    private bool Editable { get; set; } = false;
-
+    
     private MudDataGrid<Transaction>? _gridRef;
+    private bool _editable = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,9 +156,16 @@
         await ScrollToBottomAsync();
     }
 
+    private void DeleteTransaction(Transaction? transaction)
+    {
+        if (transaction is null) return;
+        Transactions.Remove(transaction);
+        OnTransactionChanged.InvokeAsync();
+    }
+
     private void EnableEdit()
     {
-        Editable = true;
+        _editable = true;
     }
     
     private async Task ScrollToBottomAsync()
@@ -168,9 +184,9 @@
     [JSInvokable]
     public async Task DisableEditAsync()
     {
-        if (Editable)
+        if (_editable)
         {
-            Editable = false;
+            _editable = false;
             await OnDisableEdit.InvokeAsync();
             StateHasChanged();
         }

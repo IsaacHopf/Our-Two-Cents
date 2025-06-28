@@ -1,6 +1,5 @@
 ﻿namespace BudgetApp.Services.Entities;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class Transaction(decimal amount, string source, string? type = null, DateTime? date = null)
 {
     public decimal Amount { get; set; } = amount;
