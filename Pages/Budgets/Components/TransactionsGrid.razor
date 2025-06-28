@@ -11,7 +11,7 @@
     <ToolBarContent>
         @if (Income)
         {
-            <MudTooltip Text="Add Income" Delay="650">
+            <MudTooltip Text="Add Income (Enter)" Delay="650">
                 <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success"
                         Class="me-4" Style="background-color: var(--mud-palette-success-lighten);"/>
             </MudTooltip>
@@ -22,7 +22,7 @@
         }
         else
         {
-            <MudTooltip Text="Add Expense" Delay="650">
+            <MudTooltip Text="Add Expense (Enter)" Delay="650">
                 <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error"
                         Class="me-4" Style="background-color: var(--mud-palette-error-lighten);"/>
             </MudTooltip>
