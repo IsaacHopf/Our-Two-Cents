@@ -83,8 +83,20 @@
         </PropertyColumn>
         <TemplateColumn>
             <EditTemplate>
-                <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                               Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                @if (Income)
+                {
+                    <MudTooltip Text="Delete Income" Delay="650">
+                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudTooltip Text="Delete Expense" Delay="650">
+                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                    </MudTooltip>
+                }
             </EditTemplate>
         </TemplateColumn>
     </Columns>
