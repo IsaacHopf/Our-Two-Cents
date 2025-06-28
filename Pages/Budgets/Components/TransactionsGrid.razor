@@ -46,7 +46,7 @@
         </PropertyColumn>
         @if (!Income)
         {
-            <PropertyColumn Property="x => x.Type">
+            <PropertyColumn Property="x => x.Type" Title="Category">
                 @*<CellTemplate>
                     <MudChip T="string" Size="Size.Small" Class="ma-0" Style="@($"background-color: {@context.Item.Type.Color};")">
                         <MudText style="font-size: .875rem;">@context.Item.Type.Name</MudText>

@@ -8,9 +8,8 @@ public class BudgetsService(CosmosClient cosmosClient, IConfiguration config)
 {
     private const string FixedBudgetName = "January 1";
 
-    private readonly Container _container = cosmosClient.GetContainer(
-        config.GetSection("DatabaseName").Value!,
-        config.GetSection("BudgetsContainerName").Value!);
+    private readonly Container _container =
+        cosmosClient.GetContainer(config["DatabaseName"], config["BudgetsContainerName"]);
 
     public async Task<Budget> GetBudgetAsync(string budgetName) =>
         await _container.ReadItemAsync<Budget>(budgetName, new PartitionKey(budgetName));

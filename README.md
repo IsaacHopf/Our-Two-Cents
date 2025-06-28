@@ -16,7 +16,6 @@
 
 ## 🚀 Getting Started
 1. Create an Azure Cosmos DB resource.
-2. Create a database in the Azure Cosmos DB resource.
-3. Create a container for the budgets with a partition key of "/id" in the Azure Cosmos DB resource.
-4. Add the Azure Cosmos DB connection string to .NET User Secrets.
-5. Add the database and container names to [appsettings.json](appsettings.json).
+2. Create a database and container with partition key "/id" in the Azure Cosmos DB resource.
+3. Add the Azure Cosmos DB connection string to .NET User Secrets.
+4. Add the database and container names to [appsettings.json](appsettings.json).
