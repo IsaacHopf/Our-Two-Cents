@@ -5,17 +5,13 @@
 
 @page "/configuration/categories"
 
+<MudTooltip Text="Add Category" Delay="650">
+    <MudFab OnClick="@SetNewEditingItemAsync" Size="Size.Medium" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+</MudTooltip>
+
 <MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual"
-             CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem"
-             EditDialogOptions="@_dialogOptions"
-             Hover="true" Bordered="true" Dense="true" Class="w-100">
-    
-    <ToolBarContent>
-        <MudTooltip Text="Add Category" Delay="650">
-            <MudFab OnClick="@SetNewEditingItemAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
-        </MudTooltip>
-    </ToolBarContent>
-    
+             CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
+             Hover="true" Bordered="true" Dense="true" Elevation="2" Class="w-100 mt-6">
     <Columns>
         <TemplateColumn>
             <CellTemplate>
@@ -26,8 +22,15 @@
         <PropertyColumn Property="x => x.Id" Hidden/>
         <PropertyColumn Property="x => x.Name" Required/>
         <PropertyColumn Property="x => x.Color" Required>
+            <CellTemplate>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <div style="background-color: @context.Item.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                    <span>@context.Item.Color</span>
+                </MudStack>
+            </CellTemplate>
             <EditTemplate>
-                <MudColorPicker Label="Color" ShowToolbar="false" ShowAlpha="false" ColorPickerMode="ColorPickerMode.HEX"/>
+                <MudColorPicker Value="@context.Item.Color" Label="Color" ShowToolbar="false" ShowAlpha="false"
+                                ShowModeSwitch="false" ColorPickerMode="ColorPickerMode.HEX"/>
             </EditTemplate>
         </PropertyColumn>
         <TemplateColumn>
@@ -37,11 +40,10 @@
             </CellTemplate>
         </TemplateColumn>
     </Columns>
-    
 </MudDataGrid>
 
 @code {
-    private List<Category> _categories = [new Category("Test")];
+    private List<Category> _categories = [];
     private MudDataGrid<Category>? _gridRef;
     private bool _addingCategory;
 
@@ -53,7 +55,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoriesRepository.GetAsync() ?? [new Category("Test")];
+        _categories = await CategoriesRepository.GetAsync();
     }
 
     private async Task SetNewEditingItemAsync()
@@ -110,12 +112,14 @@
             }
         }
 
-        // await CategoriesRepository.UpsertAsync(_categories);
-        //
-        // foreach (var budget in budgetsWithCategory)
-        //     await BudgetsRepository.UpsertAsync(budget);
-        //
-        // await FixedBudgetRepository.UpsertAsync(fixedBudget);
+        await CategoriesRepository.UpsertAsync(_categories);
+        
+        foreach (var budget in budgetsWithCategory)
+            await BudgetsRepository.UpsertAsync(budget);
+        
+        await FixedBudgetRepository.UpsertAsync(fixedBudget);
+        
+        Snackbar.Add("Category updated!", Severity.Success);
     }
 
     private async Task DeleteCategoryAsync(Category? category)

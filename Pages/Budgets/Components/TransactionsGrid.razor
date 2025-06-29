@@ -1,11 +1,12 @@
 ﻿@implements IAsyncDisposable
 @inherits BudgetApp.Pages.Shared.JSInteropComponent<TransactionsGrid>
+@inject CategoriesRepository CategoriesRepository
 @inject IScrollManager ScrollManager
 @inject ISnackbar Snackbar
 
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell"
-             Hover="true" Bordered="true" Dense="true" Elevation="0" Class="mud-datagrid-edit-onclick ps-6 pe-6 pb-6 pt-2 w-100">
+             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0" 
+             Class="mud-datagrid-edit-onclick mud-data-grid-overflow-y-hidden ps-6 pe-6 pb-6 pt-2 w-100">
     
     <ToolBarContent>
         @if (Income)
@@ -39,28 +40,36 @@
                 <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
                                  ValueChanged="x => 
                                  { 
-                                     context.Item.Amount = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
+                                     context.Item.Amount = x; 
+                                     _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
                                  }"/>
             </EditTemplate>
         </PropertyColumn>
         @if (!Income)
         {
-            <PropertyColumn Property="x => x.Category.Name" Title="Category">
-                @*<CellTemplate>
-                    <MudChip T="string" Size="Size.Small" Class="ma-0" Style="@($"background-color: {@context.Item.Type.Color};")">
-                        <MudText style="font-size: .875rem;">@context.Item.Type.Name</MudText>
-                    </MudChip>
+            <PropertyColumn Property="x => x.Category" Comparer="@(new CategoryComparer())">
+                <CellTemplate>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                        <span>@context.Item.Category.Name</span>
+                    </MudStack>
                 </CellTemplate>
                 <EditTemplate>
-                    <MudAutocomplete T="string" Value="context.Item.Type.Name"
-                                     ValueChanged="async x => { context.Item.Type = ExpenseType.FromString(x);
-                                         await _gridRef!.TransactionChanged(context.Item); }"
-                                     SearchFunc="@GetExpenseTypes" SelectValueOnTab Required Clearable>
-                        <ItemTemplate Context="e">
-                            <MudText Class="mud-datagrid-edit-onclick" Style="font-size: .875rem;">@e</MudText>
-                        </ItemTemplate>
-                    </MudAutocomplete>
-                </EditTemplate>*@
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
+                        <MudAutocomplete T="Category" Value="@context.Item.Category" 
+                                         ValueChanged="x => 
+                                         { 
+                                             context.Item.Category = x;
+                                             _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
+                                         }"
+                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectValueOnTab="true" Required="true" Clearable="true">
+                            <ItemTemplate Context="e">
+                                <MudText Class="mud-datagrid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
+                            </ItemTemplate>
+                        </MudAutocomplete>
+                    </MudStack>
+                </EditTemplate>
             </PropertyColumn>
         }
         <PropertyColumn Property="x => x.Date" Format="MMM. d">
@@ -128,6 +137,14 @@
             this, 
             "executeCallbackOnEditMudDataGridEnter", 
             nameof(AddTransactionAsync));
+    }
+
+    private async Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken token)
+    {
+        var categories = await CategoriesRepository.GetAsync();
+        return string.IsNullOrEmpty(searchValue) 
+            ? categories 
+            : categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>

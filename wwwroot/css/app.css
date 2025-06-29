@@ -37,4 +37,12 @@ a:hover {
     color: inherit;
 }
 
+.mud-table-root .mud-table-head .mud-table-cell {
+    font-weight: 550;
+}
+
+.mud-data-grid-overflow-y-hidden .mud-table-container {
+    overflow-y: hidden;
+}
+
 /* endregion */
