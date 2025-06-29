@@ -4,5 +4,5 @@ public class Categories
 {
     public const string Id = "Categories";
     public const string Discriminator = "Categories";
-    public Category[] Items { get; init; } = [];
+    public List<Category> Items { get; init; } = [];
 }

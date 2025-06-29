@@ -16,7 +16,7 @@
             </MudTooltip>
             <MudTooltip Text="Add Fixed Income" Delay="650">
                 <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"
-                        Class="me-4" Style="background-color: var(--mud-palette-success-lighten);"/>
+                        Style="background-color: var(--mud-palette-success-lighten);"/>
             </MudTooltip>
         }
         else
@@ -27,7 +27,7 @@
             </MudTooltip>
             <MudTooltip Text="Add Fixed Expenses" Delay="650">
                 <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"
-                        Class="me-4" Style="background-color: var(--mud-palette-error-lighten);"/>
+                        Style="background-color: var(--mud-palette-error-lighten);"/>
             </MudTooltip>
         }
     </ToolBarContent>
@@ -45,7 +45,7 @@
         </PropertyColumn>
         @if (!Income)
         {
-            <PropertyColumn Property="x => x.Type" Title="Category">
+            <PropertyColumn Property="x => x.Category.Name" Title="Category">
                 @*<CellTemplate>
                     <MudChip T="string" Size="Size.Small" Class="ma-0" Style="@($"background-color: {@context.Item.Type.Color};")">
                         <MudText style="font-size: .875rem;">@context.Item.Type.Name</MudText>
@@ -140,7 +140,9 @@
     [JSInvokable]
     public async Task AddTransactionAsync()
     {
-        Transactions.Add(new Transaction(0, string.Empty, "Misc."));
+        Transactions.Add(Income 
+            ? new Transaction(0, string.Empty, new Category("Income")) 
+            : new Transaction(0, string.Empty, new Category("Misc.")));
 
         // Needed when adding transactions with "Enter" key.
         StateHasChanged();

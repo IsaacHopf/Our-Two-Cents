@@ -7,7 +7,7 @@ namespace BudgetApp.Services.Repositories;
 public class CategoriesRepository(CosmosClient cosmosClient, IConfiguration config)
     : BaseRepository(cosmosClient, config)
 {
-    public async Task<Category[]?> GetAsync()
+    public async Task<List<Category>?> GetAsync()
     {
         try
         {
@@ -15,13 +15,13 @@ public class CategoriesRepository(CosmosClient cosmosClient, IConfiguration conf
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            return [];
+            return null;
         }
     }
 
-    public async Task UpsertAsync(Category[] categories)
+    public async Task UpsertAsync(List<Category> categories)
     {
-        if (categories.Length == 0) return;
+        if (categories.Count == 0) return;
         await UpsertAsync(Categories.Id, new Categories { Items = categories });
     }
         

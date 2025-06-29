@@ -1,23 +1,144 @@
-﻿@inject CategoriesRepository CategoriesRepository
+﻿@inject BudgetsRepository BudgetsRepository;
+@inject CategoriesRepository CategoriesRepository
+@inject FixedBudgetRepository FixedBudgetRepository;
+@inject ISnackbar Snackbar
 
 @page "/configuration/categories"
 
-<MudDataGrid Items="@_categories" Readonly="false">
+<MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual"
+             CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem"
+             EditDialogOptions="@_dialogOptions"
+             Hover="true" Bordered="true" Dense="true" Class="w-100">
+    
+    <ToolBarContent>
+        <MudTooltip Text="Add Category" Delay="650">
+            <MudFab OnClick="@SetNewEditingItemAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+        </MudTooltip>
+    </ToolBarContent>
+    
     <Columns>
-        <PropertyColumn Property="x => x.Name"/>
-        <PropertyColumn Property="x => x.Color">
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton OnClick="@context.Actions.StartEditingItemAsync" Icon="@Icons.Material.Rounded.Edit" 
+                               Size="@Size.Small" Color="Color.Primary" Class="pa-0 ma-0 opacity-75"/>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Id" Hidden/>
+        <PropertyColumn Property="x => x.Name" Required/>
+        <PropertyColumn Property="x => x.Color" Required>
             <EditTemplate>
-                <MudColorPicker Label="Color" ShowToolbar="false" ShowAlpha="false"/>
+                <MudColorPicker Label="Color" ShowToolbar="false" ShowAlpha="false" ColorPickerMode="ColorPickerMode.HEX"/>
             </EditTemplate>
         </PropertyColumn>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton OnClick="@(() => DeleteCategoryAsync(context.Item))" Icon="@Icons.Material.Rounded.Delete" 
+                               Size="@Size.Small" Color="Color.Error" Class="pa-0 ma-0 opacity-75" />
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
+    
 </MudDataGrid>
 
 @code {
-    private Category[]? _categories;
+    private List<Category> _categories = [new Category("Test")];
+    private MudDataGrid<Category>? _gridRef;
+    private bool _addingCategory;
+
+    private readonly DialogOptions _dialogOptions = new()
+    {
+        Position = DialogPosition.TopCenter,
+        CloseOnEscapeKey = true,
+    };
     
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoriesRepository.GetAsync();
+        _categories = await CategoriesRepository.GetAsync() ?? [new Category("Test")];
+    }
+
+    private async Task SetNewEditingItemAsync()
+    {
+        _addingCategory = true;
+        await _gridRef?.SetEditingItemAsync(new Category(string.Empty))!;
+        StateHasChanged();
+    }
+
+    private async Task CommittedItemChangesAsync(Category category)
+    {
+        if (_addingCategory) await AddCategoryAsync(category);
+        else await EditCategoryAsync(category);
+    }
+
+    private void CanceledEditingItem()
+    {
+        _addingCategory = false;
+    }
+
+    private async Task AddCategoryAsync(Category category)
+    {
+        if (_categories.Select(x => x.Name).Contains(category.Name))
+        {
+            Snackbar.Add($"'{category.Name}' is already used as a Category name.", Severity.Warning);
+            return;
+        }
+            
+        _addingCategory = false;
+            
+        _categories.Add(category);
+        await CategoriesRepository.UpsertAsync(_categories);
+    }
+
+    private async Task EditCategoryAsync(Category category)
+    {
+        var budgetsWithCategory = await BudgetsRepository.Query()
+            .Where(budget => budget.Expenses.Any(expense => expense.Category.Id == category.Id))
+            .ToListAsync();
+        foreach (var budget in budgetsWithCategory)
+        {
+            foreach (var expense in budget.Expenses.Where(expense => expense.Category.Id == category.Id))
+            {
+                expense.Category = category;
+            }
+        }
+    
+        var fixedBudget = await FixedBudgetRepository.GetAsync();
+        if (fixedBudget.Expenses.Any(expense => expense.Category.Id == category.Id))
+        {
+            foreach (var expense in fixedBudget.Expenses.Where(expense => expense.Category.Id == category.Id))
+            {
+                expense.Category = category;
+            }
+        }
+
+        // await CategoriesRepository.UpsertAsync(_categories);
+        //
+        // foreach (var budget in budgetsWithCategory)
+        //     await BudgetsRepository.UpsertAsync(budget);
+        //
+        // await FixedBudgetRepository.UpsertAsync(fixedBudget);
+    }
+
+    private async Task DeleteCategoryAsync(Category? category)
+    {
+        if (category is null) return;
+        
+        var budgetsWithCategory = await BudgetsRepository.Query()
+            .Where(budget => budget.Expenses.Any(expense => expense.Category.Id == category.Id))
+            .ToEnumerableAsync();
+        if (budgetsWithCategory.Any())
+        {
+            Snackbar.Add($"'{category.Name}' is used in some budgets.", Severity.Warning);
+            return;
+        }
+
+        var fixedBudget = await FixedBudgetRepository.GetAsync();
+        if (fixedBudget.Expenses.Any(expense => expense.Category.Id == category.Id))
+        {
+            Snackbar.Add($"'{category.Name}' is used in the fixed budget.", Severity.Warning);
+            return;
+        }
+
+        _categories.Remove(category);
+        await CategoriesRepository.UpsertAsync(_categories);
     }
 }
