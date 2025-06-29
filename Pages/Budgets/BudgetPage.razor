@@ -1,7 +1,7 @@
-﻿@inject BudgetsService BudgetService
+﻿@inject BudgetsRepository BudgetsRepository
+@inject FixedBudgetRepository FixedBudgetRepository
 @inject ISnackbar Snackbar
 @using BudgetApp.Pages.Budgets.Components
-@using System.Collections.ObjectModel
 
 @page "/budgets/{budgetName}"
 
@@ -11,30 +11,33 @@
     <ReadOnlyCurrencyTextField Value="@_budget?.Net" Label="Net"/>
 </MudStack>
 
-<MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="40px">
-    <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
-        @if (_budget is not null)
-        {
+@if (_budget is null)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="40px">
+        <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" 
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes" 
                               OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
-        }
-    </MudTabPanel>
-    <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
-        @if (_budget is not null)
-        {
+        </MudTabPanel>
+        <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
             <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" 
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses" 
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
-        }
-    </MudTabPanel>
-    <MudTabPanel Text="Charts" Icon="@Icons.Material.Rounded.PieChartOutline">
-        <MudText>Content One</MudText>
-    </MudTabPanel>
-    <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
-        <MudText>Content One</MudText>
-    </MudTabPanel>
-</MudTabs>
+        </MudTabPanel>
+        <MudTabPanel Text="Charts" Icon="@Icons.Material.Rounded.PieChartOutline">
+            <MudText>Content One</MudText>
+        </MudTabPanel>
+        <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
+            <MudText>Content One</MudText>
+        </MudTabPanel>
+    </MudTabs>
+}
 
 @code {
     [Parameter] public required string BudgetName { get; set; }
@@ -43,17 +46,16 @@
     private ObservableCollection<Transaction> _incomes = [];
     private ObservableCollection<Transaction> _expenses = [];
     private bool _hasBudgetChanged = false;
-    //private bool _isTotalExpensesByTypeChartExpanded = true;
 
-    private Budget? _fixedBudget;
+    private FixedBudget? _fixedBudget;
     
     protected override async Task OnInitializedAsync()
     {
-        _budget = await BudgetService.GetBudgetAsync(BudgetName);
+        _budget = await BudgetsRepository.GetAsync(BudgetName);
         _incomes = new ObservableCollection<Transaction>(_budget.Incomes);
         _expenses = new ObservableCollection<Transaction>(_budget.Expenses);
 
-        _fixedBudget = await BudgetService.GetFixedBudget();
+        _fixedBudget = await FixedBudgetRepository.GetAsync();
         _fixedBudget.Incomes.ForEach(transaction =>
         {
             transaction.Date = transaction.Date.HasValue 
@@ -86,7 +88,7 @@
             return;
         }
 
-        await BudgetService.UpsertBudgetAsync(_budget!);
+        await BudgetsRepository.UpsertAsync(_budget!);
 
         _hasBudgetChanged = false;
         Snackbar.Add("Budget saved!", Severity.Success);

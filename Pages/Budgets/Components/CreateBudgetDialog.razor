@@ -1,6 +1,7 @@
-﻿@inject BudgetsService BudgetsService
-@inject NavigationManager NavigationManager
+﻿@inject BudgetsRepository BudgetsRepository
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@using System.Globalization
 
 <MudDialog>
 
@@ -10,8 +11,8 @@
 
     <DialogContent>
         <MudStack Row>
-            <MudAutocomplete @bind-Value="_month" SearchFunc="@SearchMonths" ToStringFunc="@(value => value.ToMonthName())" Required="true" 
-                             MaxItems="null" Clearable="true" Label="Month" Variant="Variant.Filled" ResetValueOnEmptyText="true" />
+            <MudAutocomplete @bind-Value="_month" SearchFunc="@SearchMonths" ToStringFunc="@(value => GetMonthName(value))" 
+                             Required="true" MaxItems="null" Clearable="true" Label="Month" Variant="Variant.Filled" ResetValueOnEmptyText="true" />
             <MudNumericField @bind-Value="_year" Required="true" Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" />
         </MudStack>
     </DialogContent>
@@ -37,7 +38,7 @@
     {
         return Task.FromResult(string.IsNullOrWhiteSpace(value)
             ? _months
-            : _months.Where(x => x.ToMonthName().Contains(value, StringComparison.InvariantCultureIgnoreCase)));
+            : _months.Where(x => GetMonthName(x).Contains(value, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     private async Task SubmitAsync()
@@ -50,8 +51,12 @@
             return;
         }
 
-        await BudgetsService.UpsertBudgetAsync(newBudget);
+        await BudgetsRepository.UpsertAsync(newBudget);
         
         NavigationManager.NavigateTo($"/budgets/{newBudget.Name}");
     }
+
+    private static string GetMonthName(int month) =>
+        CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+
 }

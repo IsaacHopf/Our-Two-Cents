@@ -1,8 +1,9 @@
 ﻿// ReSharper disable InconsistentNaming
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace BudgetApp.Services;
+namespace BudgetApp.Pages.Shared;
 
 /// <remarks>
 /// Add JavaScript code to "wwwroot/scripts". Be sure to link the script in "wwwroot/index.html".

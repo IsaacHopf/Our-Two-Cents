@@ -17,5 +17,18 @@
 ## 🚀 Getting Started
 1. Create an Azure Cosmos DB resource.
 2. Create a database and container with partition key "/id" in the Azure Cosmos DB resource.
-3. Add the Azure Cosmos DB connection string to .NET User Secrets.
-4. Add the database and container names to [appsettings.json](appsettings.json).
+3. Edit the container's Indexing Policy and add composite indexes for "year" and "month" (to enable ordering by year and month):
+   ```
+   "compositeIndexes": [
+       [
+           {
+               "path": "/year"
+           },
+           {
+               "path": "/month"
+           }
+       ]
+   ]
+   ```
+4. Add the Azure Cosmos DB connection string to .NET User Secrets.
+5. Add the database and container names to [appsettings.json](appsettings.json).

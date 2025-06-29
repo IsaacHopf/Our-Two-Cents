@@ -1,8 +1,7 @@
 ﻿@implements IAsyncDisposable
-@inherits JSInteropComponent<TransactionsGrid>
+@inherits BudgetApp.Pages.Shared.JSInteropComponent<TransactionsGrid>
 @inject IScrollManager ScrollManager
 @inject ISnackbar Snackbar
-@using System.Collections.ObjectModel
 
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
              ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell"

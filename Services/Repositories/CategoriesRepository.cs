@@ -1,0 +1,28 @@
+﻿using BudgetApp.Services.Entities;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
+
+namespace BudgetApp.Services.Repositories;
+
+public class CategoriesRepository(CosmosClient cosmosClient, IConfiguration config)
+    : BaseRepository(cosmosClient, config)
+{
+    public async Task<Category[]?> GetAsync()
+    {
+        try
+        {
+            return (await GetAsync<Categories>(Categories.Id)).Items;
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return [];
+        }
+    }
+
+    public async Task UpsertAsync(Category[] categories)
+    {
+        if (categories.Length == 0) return;
+        await UpsertAsync(Categories.Id, new Categories { Items = categories });
+    }
+        
+}

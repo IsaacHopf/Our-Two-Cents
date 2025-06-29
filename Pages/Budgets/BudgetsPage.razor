@@ -1,4 +1,4 @@
-﻿@inject BudgetsService BudgetsService
+﻿@inject BudgetsRepository BudgetsRepository
 @inject IDialogService DialogService
 @using BudgetApp.Pages.Budgets.Components
 
@@ -19,21 +19,31 @@
     }
 </MudStack>
 
-<MudList T="string">
-    <MudDivider />
-    @foreach (var item in _budgetNameItems)
-    {
-        <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
-            <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
-            <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
-                         Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
-        </MudStack>
+@if (_isLoading)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudList T="string">
         <MudDivider />
-    }
-</MudList>
+        @foreach (var item in _budgetNameItems)
+        {
+            <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
+                <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
+                <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
+                             Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
+            </MudStack>
+            <MudDivider />
+        }
+    </MudList>
+}
 
 @code {
     private int? _year = DateTime.Today.Year;
+    private bool _isLoading = true;
     /// <remarks>Must be a list. Otherwise, the checkboxes don't update.</remarks>
     private List<BudgetNameItem> _budgetNameItems = [];
     private bool _showDelete = false;
@@ -45,9 +55,14 @@
 
     private async Task SetBudgetNameItemsAsync()
     {
-        _budgetNameItems = _year is null
-            ? (await BudgetsService.GetBudgetsAsync()).OrderByDateDescending().Select(x => new BudgetNameItem(x.Name)).ToList()
-            : (await BudgetsService.GetBudgetsAsync((int)_year)).OrderByDateDescending().Select(x => new BudgetNameItem(x.Name)).ToList();
+        var query = _year is null
+            ? BudgetsRepository.Query().OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
+            : BudgetsRepository.Query().Where(x => x.Year == (int)_year).OrderByDescending(x => x.Month);
+        
+        var budgetNames = await query.Select(x => x.Name).ToEnumerableAsync();
+        _budgetNameItems = budgetNames.Select(name => new BudgetNameItem(name)).ToList();
+
+        _isLoading = false;
     }
 
     private async Task YearValueChangedHandler(int? year)

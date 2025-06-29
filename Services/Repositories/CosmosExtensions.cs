@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Linq;
 
-namespace BudgetApp.Services;
+namespace BudgetApp.Services.Repositories;
 
 public static class CosmosExtensions
 {
@@ -13,4 +13,10 @@ public static class CosmosExtensions
 
         return items;
     }
+
+    public static async Task<List<T>> ToListAsync<T>(this IQueryable<T> queryable) =>
+        (await queryable.ToEnumerableAsync()).ToList();
+
+    public static async Task<T[]> ToArrayAsync<T>(this IQueryable<T> queryable) =>
+        (await queryable.ToEnumerableAsync()).ToArray();
 }

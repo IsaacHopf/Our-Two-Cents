@@ -40,10 +40,13 @@
 
 	<ItemGroup>
 	  <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+	  <_ContentIncludedByDefault Remove="BudgetApp.Services\obj\BudgetApp.Services.csproj.nuget.dgspec.json" />
+	  <_ContentIncludedByDefault Remove="BudgetApp.Services\obj\project.assets.json" />
+	  <_ContentIncludedByDefault Remove="BudgetApp.Services\obj\project.packagespec.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Pages\Configuration\" />
+	  <Folder Include="Services\" />
 	</ItemGroup>
 
 </Project>

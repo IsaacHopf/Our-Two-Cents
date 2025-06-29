@@ -1,4 +1,4 @@
-﻿@inject BudgetsService BudgetsService
+﻿@inject BudgetsRepository BudgetsRepository
 @inject NavigationManager NavigationManager
 
 <MudDialog>
@@ -26,11 +26,7 @@
 
     private async Task SubmitAsync()
     {
-        await Task.WhenAll(BudgetNamesToDelete.Select(budgetName => BudgetsService.DeleteBudgetAsync(budgetName)));
-        
-        // foreach(var budgetName in BudgetNamesToDelete)
-        //     await BudgetsService.DeleteBudgetAsync(budgetName);
-        
+        await Task.WhenAll(BudgetNamesToDelete.Select(budgetName => BudgetsRepository.DeleteAsync(budgetName)));
         NavigationManager.NavigateTo("/budgets", true);
     }
 }

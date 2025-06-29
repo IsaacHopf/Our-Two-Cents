@@ -1,0 +1,23 @@
+﻿@inject CategoriesRepository CategoriesRepository
+
+@page "/configuration/categories"
+
+<MudDataGrid Items="@_categories" Readonly="false">
+    <Columns>
+        <PropertyColumn Property="x => x.Name"/>
+        <PropertyColumn Property="x => x.Color">
+            <EditTemplate>
+                <MudColorPicker Label="Color" ShowToolbar="false" ShowAlpha="false"/>
+            </EditTemplate>
+        </PropertyColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private Category[]? _categories;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await CategoriesRepository.GetAsync();
+    }
+}

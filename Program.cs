@@ -1,5 +1,5 @@
 using System.Text.Json;
-using BudgetApp.Services;
+using BudgetApp.Services.Repositories;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +36,10 @@ public class Program
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
             });
-        builder.Services.AddSingleton(new BudgetsService(cosmosClient, config));
+        
+        builder.Services.AddSingleton(new BudgetsRepository(cosmosClient, config));
+        builder.Services.AddSingleton(new FixedBudgetRepository(cosmosClient, config));
+        builder.Services.AddSingleton(new CategoriesRepository(cosmosClient, config));
 
         builder.RootComponents.Add<App>("#app");
 
