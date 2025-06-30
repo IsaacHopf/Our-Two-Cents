@@ -41,7 +41,7 @@ a:hover {
     font-weight: 550;
 }
 
-.mud-data-grid-overflow-y-hidden .mud-table-container {
+.mud-table-overflow-y-hidden .mud-table-container {
     overflow-y: hidden;
 }
 

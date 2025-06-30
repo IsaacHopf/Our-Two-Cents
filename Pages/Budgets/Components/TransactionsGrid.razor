@@ -6,7 +6,7 @@
 
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
              ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0" 
-             Class="mud-datagrid-edit-onclick mud-data-grid-overflow-y-hidden ps-6 pe-6 pb-6 pt-2 w-100">
+             Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-2 w-100">
     
     <ToolBarContent>
         @if (Income)
@@ -34,7 +34,7 @@
     </ToolBarContent>
     
     <Columns>
-        <PropertyColumn Property="x => x.Source"/>
+        <PropertyColumn Property="x => x.Source" Required="false"/>
         <PropertyColumn Property="x => x.Amount" Format="C">
             <EditTemplate>
                 <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
@@ -65,7 +65,7 @@
                                          }"
                                          SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectValueOnTab="true" Required="true" Clearable="true">
                             <ItemTemplate Context="e">
-                                <MudText Class="mud-datagrid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
+                                <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
                             </ItemTemplate>
                         </MudAutocomplete>
                     </MudStack>
