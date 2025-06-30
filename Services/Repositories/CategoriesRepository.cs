@@ -7,11 +7,11 @@ namespace BudgetApp.Services.Repositories;
 public class CategoriesRepository(CosmosClient cosmosClient, IConfiguration config)
     : BaseRepository(cosmosClient, config)
 {
-    public async Task<List<Category>> GetAsync()
+    public async Task<List<Category>> ReadAsync()
     {
         try
         {
-            return (await GetAsync<Categories>("Categories")).Items;
+            return (await ReadAsync<Categories>("Categories")).Items;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {

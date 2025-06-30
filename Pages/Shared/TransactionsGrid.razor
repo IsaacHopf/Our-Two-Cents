@@ -145,7 +145,7 @@
             "executeCallbackOnEditMudDataGridEnter", 
             nameof(AddTransactionAsync));
         
-        _categories = await CategoriesRepository.GetAsync();
+        _categories = await CategoriesRepository.ReadAsync();
     }
 
     private Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken cancellationToken)

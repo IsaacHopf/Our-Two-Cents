@@ -51,11 +51,11 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        _budget = await BudgetsRepository.GetAsync(BudgetName);
+        _budget = await BudgetsRepository.ReadAsync(BudgetName);
         _incomes = new ObservableCollection<Transaction>(_budget.Incomes);
         _expenses = new ObservableCollection<Transaction>(_budget.Expenses);
 
-        _fixedBudget = await FixedBudgetRepository.GetAsync();
+        _fixedBudget = await FixedBudgetRepository.ReadAsync();
         _fixedBudget.Incomes.ForEach(transaction =>
         {
             transaction.Date = transaction.Date.HasValue 

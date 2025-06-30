@@ -31,7 +31,7 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        _fixedBudget = await FixedBudgetRepository.GetAsync();
+        _fixedBudget = await FixedBudgetRepository.ReadAsync();
         _incomes = new ObservableCollection<Transaction>(_fixedBudget.Incomes);
         _expenses = new ObservableCollection<Transaction>(_fixedBudget.Expenses);
     }

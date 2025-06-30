@@ -62,7 +62,7 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoriesRepository.GetAsync();
+        _categories = await CategoriesRepository.ReadAsync();
     }
 
     private async Task SetNewEditingItemAsync()
@@ -110,7 +110,7 @@ else
             }
         }
     
-        var fixedBudget = await FixedBudgetRepository.GetAsync();
+        var fixedBudget = await FixedBudgetRepository.ReadAsync();
         if (fixedBudget.Expenses.Any(expense => expense.Category.Id == category.Id))
         {
             foreach (var expense in fixedBudget.Expenses.Where(expense => expense.Category.Id == category.Id))
@@ -142,7 +142,7 @@ else
             return;
         }
 
-        var fixedBudget = await FixedBudgetRepository.GetAsync();
+        var fixedBudget = await FixedBudgetRepository.ReadAsync();
         if (fixedBudget.Expenses.Any(expense => expense.Category.Id == category.Id))
         {
             Snackbar.Add($"'{category.Name}' is used in the fixed budget.", Severity.Warning);
