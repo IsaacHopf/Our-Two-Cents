@@ -15,10 +15,13 @@
                 <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success"
                         Class="me-4" Style="background-color: var(--mud-palette-success-lighten);"/>
             </MudTooltip>
-            <MudTooltip Text="Add Fixed Income" Delay="650">
-                <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"
-                        Style="background-color: var(--mud-palette-success-lighten);"/>
-            </MudTooltip>
+            if (FixedTransactions is not null)
+            {
+                <MudTooltip Text="Add Fixed Income" Delay="650">
+                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"
+                            Style="background-color: var(--mud-palette-success-lighten);"/>
+                </MudTooltip>
+            }
         }
         else
         {
@@ -26,10 +29,13 @@
                 <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error"
                         Class="me-4" Style="background-color: var(--mud-palette-error-lighten);"/>
             </MudTooltip>
-            <MudTooltip Text="Add Fixed Expenses" Delay="650">
-                <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"
-                        Style="background-color: var(--mud-palette-error-lighten);"/>
-            </MudTooltip>
+            if (FixedTransactions is not null)
+            {
+                <MudTooltip Text="Add Fixed Expenses" Delay="650">
+                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"
+                            Style="background-color: var(--mud-palette-error-lighten);"/>
+                </MudTooltip>
+            }
         }
     </ToolBarContent>
     
@@ -117,10 +123,11 @@
     [Parameter] public required int Year { get; set; }
     [Parameter] public required int Month { get; set; }
     [Parameter] public required ObservableCollection<Transaction> Transactions { get; set; }
-    [Parameter] public required IEnumerable<Transaction> FixedTransactions { get; set; } = [];
+    [Parameter] public IEnumerable<Transaction>? FixedTransactions { get; set; }
     [Parameter] public EventCallback<Transaction> OnTransactionChanged { get; set; }
     [Parameter] public EventCallback OnDisableEdit { get; set; }
-    
+
+    private List<Category> _categories = [];
     private MudDataGrid<Transaction>? _gridRef;
     private bool _editable = false;
 
@@ -137,14 +144,15 @@
             this, 
             "executeCallbackOnEditMudDataGridEnter", 
             nameof(AddTransactionAsync));
+        
+        _categories = await CategoriesRepository.GetAsync();
     }
 
-    private async Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken token)
+    private Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken cancellationToken)
     {
-        var categories = await CategoriesRepository.GetAsync();
-        return string.IsNullOrEmpty(searchValue) 
-            ? categories 
-            : categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
+        return Task.FromResult(string.IsNullOrEmpty(searchValue) 
+            ? _categories 
+            : _categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     /// <summary>
@@ -158,8 +166,8 @@
     public async Task AddTransactionAsync()
     {
         Transactions.Add(Income 
-            ? new Transaction(0, string.Empty, new Category("Income")) 
-            : new Transaction(0, string.Empty, new Category("Misc.")));
+            ? new Transaction(0, string.Empty, _categories.Find(x => x.Name == "Income") ?? new Category("Income")) 
+            : new Transaction(0, string.Empty, _categories.Find(x => x.Name == "Misc.") ?? _categories.Last()));
 
         // Needed when adding transactions with "Enter" key.
         StateHasChanged();
@@ -170,7 +178,7 @@
 
     private async Task AddFixedTransactionsAsync()
     {
-        if (!FixedTransactions.Any()) return;
+        if (FixedTransactions == null || !FixedTransactions.Any()) return;
 
         if (!FixedTransactions.Except(Transactions, new TransactionComparer()).Any())
         {

@@ -1,0 +1,64 @@
+﻿@inject FixedBudgetRepository FixedBudgetRepository
+@inject ISnackbar Snackbar
+
+@page "/configuration/fixed-budget"
+
+@if (_fixedBudget is null)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" MinimumTabWidth="40px">
+        <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
+            <TransactionsGrid Income="true" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_incomes"
+                              OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
+        </MudTabPanel>
+        <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
+            <TransactionsGrid Income="false" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_expenses"
+                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
+        </MudTabPanel>
+    </MudTabs>
+}
+
+@code {
+    private FixedBudget? _fixedBudget;
+    private ObservableCollection<Transaction> _incomes = [];
+    private ObservableCollection<Transaction> _expenses = [];
+    private bool _hasBudgetChanged = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _fixedBudget = await FixedBudgetRepository.GetAsync();
+        _incomes = new ObservableCollection<Transaction>(_fixedBudget.Incomes);
+        _expenses = new ObservableCollection<Transaction>(_fixedBudget.Expenses);
+    }
+
+    private void UpdateIncome()
+    {
+        _fixedBudget!.Incomes = _incomes.ToList();
+        _hasBudgetChanged = true;
+    }
+
+    private void UpdateExpenses()
+    {
+        _fixedBudget!.Expenses = _expenses.ToList();
+        _hasBudgetChanged = true;
+    }
+    
+    private async Task SaveBudgetAsync()
+    {
+        if (!_hasBudgetChanged)
+        {
+            Snackbar.Add("No changes to save.", Severity.Info);
+            return;
+        }
+
+        await FixedBudgetRepository.UpsertAsync(_fixedBudget!);
+
+        _hasBudgetChanged = false;
+        Snackbar.Add("Fixed budget saved!", Severity.Success);
+    }
+}
