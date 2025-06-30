@@ -11,12 +11,14 @@
 
 <MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual"
              CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
-             Hover="true" Bordered="true" Dense="true" Elevation="2" Class="w-100 mt-6">
+             Hover="true" Bordered="true" Dense="true" Elevation="2" Class="mud-table-overflow-y-hidden w-100 mt-6">
     <Columns>
         <TemplateColumn>
             <CellTemplate>
-                <MudIconButton OnClick="@context.Actions.StartEditingItemAsync" Icon="@Icons.Material.Rounded.Edit" 
-                               Size="@Size.Small" Color="Color.Primary" Class="pa-0 ma-0 opacity-75"/>
+                <div class="d-flex justify-content-end">
+                    <MudIconButton OnClick="@context.Actions.StartEditingItemAsync" Icon="@Icons.Material.Rounded.Edit"
+                                   Size="@Size.Small" Color="Color.Primary" Class="pa-0 ma-0 opacity-75"/>
+                </div>
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Id" Hidden/>
@@ -29,8 +31,8 @@
                 </MudStack>
             </CellTemplate>
             <EditTemplate>
-                <MudColorPicker Value="@context.Item.Color" Label="Color" ShowToolbar="false" ShowAlpha="false"
-                                ShowModeSwitch="false" ColorPickerMode="ColorPickerMode.HEX"/>
+                <MudColorPicker Value="@context.Item.Color" Label="Color" ShowToolbar="true" ShowAlpha="false"
+                                ShowModeSwitch="false" ColorPickerMode="ColorPickerMode.HEX" />
             </EditTemplate>
         </PropertyColumn>
         <TemplateColumn>
@@ -51,6 +53,7 @@
     {
         Position = DialogPosition.TopCenter,
         CloseOnEscapeKey = true,
+        NoHeader = true
     };
     
     protected override async Task OnInitializedAsync()
