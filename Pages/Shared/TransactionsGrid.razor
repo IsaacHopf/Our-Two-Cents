@@ -6,7 +6,7 @@
 
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
              ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0" 
-             Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-2 w-100">
+             Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-1 w-100">
     
     <ToolBarContent>
         @if (Income)

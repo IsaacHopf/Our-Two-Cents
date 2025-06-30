@@ -45,4 +45,8 @@ a:hover {
     overflow-y: hidden;
 }
 
+.mud-dialog-content {
+    overflow-y: hidden !important;
+}
+
 /* endregion */

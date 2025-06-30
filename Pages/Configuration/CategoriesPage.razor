@@ -5,47 +5,51 @@
 
 @page "/configuration/categories"
 
-<MudTooltip Text="Add Category" Delay="650">
-    <MudFab OnClick="@SetNewEditingItemAsync" Size="Size.Medium" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
-</MudTooltip>
-
-<MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.Manual"
-             CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
-             Hover="true" Bordered="true" Dense="true" Elevation="2" Class="mud-table-overflow-y-hidden w-100 mt-6">
-    <Columns>
-        <TemplateColumn>
-            <CellTemplate>
-                <div class="d-flex justify-content-end">
-                    <MudIconButton OnClick="@context.Actions.StartEditingItemAsync" Icon="@Icons.Material.Rounded.Edit"
-                                   Size="@Size.Small" Color="Color.Primary" Class="pa-0 ma-0 opacity-75"/>
-                </div>
-            </CellTemplate>
-        </TemplateColumn>
-        <PropertyColumn Property="x => x.Id" Hidden/>
-        <PropertyColumn Property="x => x.Name" Required/>
-        <PropertyColumn Property="x => x.Color" Required>
-            <CellTemplate>
-                <MudStack Row="true" AlignItems="AlignItems.Center">
-                    <div style="background-color: @context.Item.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                    <span>@context.Item.Color</span>
-                </MudStack>
-            </CellTemplate>
-            <EditTemplate>
-                <MudColorPicker Value="@context.Item.Color" Label="Color" ShowToolbar="true" ShowAlpha="false"
-                                ShowModeSwitch="false" ColorPickerMode="ColorPickerMode.HEX" />
-            </EditTemplate>
-        </PropertyColumn>
-        <TemplateColumn>
-            <CellTemplate>
-                <MudIconButton OnClick="@(() => DeleteCategoryAsync(context.Item))" Icon="@Icons.Material.Rounded.Delete" 
-                               Size="@Size.Small" Color="Color.Error" Class="pa-0 ma-0 opacity-75" />
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
+@if (_categories is null)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.OnRowClick"
+                 CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
+                 Hover="true" Bordered="true" Dense="true" Elevation="2" Class="mud-table-overflow-y-hidden w-100 ps-4 pe-4 pb-4 pt-1 ">
+        
+        <ToolBarContent>
+            <MudTooltip Text="Add Category" Delay="650">
+                <MudFab OnClick="@SetNewEditingItemAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Primary"/>
+            </MudTooltip>
+        </ToolBarContent>
+        
+        <Columns>
+            <PropertyColumn Property="x => x.Id" Hidden/>
+            <PropertyColumn Property="x => x.Name" Required/>
+            <PropertyColumn Property="x => x.Color" Required>
+                <CellTemplate>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                        <span>@context.Item.Color</span>
+                    </MudStack>
+                </CellTemplate>
+                <EditTemplate>
+                    <MudColorPicker Value="@context.Item.Color" Label="Color" ShowToolbar="true" ShowAlpha="false"
+                                    ShowModeSwitch="false" ColorPickerMode="ColorPickerMode.HEX" Class="mt-2"/>
+                </EditTemplate>
+            </PropertyColumn>
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudIconButton OnClick="@(() => DeleteCategoryAsync(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                   Size="@Size.Small" Color="Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+}
 
 @code {
-    private List<Category> _categories = [];
+    private List<Category>? _categories;
     private MudDataGrid<Category>? _gridRef;
     private bool _addingCategory;
 
@@ -81,7 +85,7 @@
 
     private async Task AddCategoryAsync(Category category)
     {
-        if (_categories.Select(x => x.Name).Contains(category.Name))
+        if (_categories!.Select(x => x.Name).Contains(category.Name))
         {
             Snackbar.Add($"'{category.Name}' is already used as a Category name.", Severity.Warning);
             return;
@@ -89,7 +93,7 @@
             
         _addingCategory = false;
             
-        _categories.Add(category);
+        _categories!.Add(category);
         await CategoriesRepository.UpsertAsync(_categories);
     }
 
@@ -115,7 +119,7 @@
             }
         }
 
-        await CategoriesRepository.UpsertAsync(_categories);
+        await CategoriesRepository.UpsertAsync(_categories!);
         
         foreach (var budget in budgetsWithCategory)
             await BudgetsRepository.UpsertAsync(budget);
@@ -145,7 +149,7 @@
             return;
         }
 
-        _categories.Remove(category);
+        _categories!.Remove(category);
         await CategoriesRepository.UpsertAsync(_categories);
     }
 }
