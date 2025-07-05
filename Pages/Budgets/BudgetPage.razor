@@ -30,11 +30,16 @@ else
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses" 
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
-        <MudTabPanel Text="Charts" Icon="@Icons.Material.Rounded.PieChartOutline">
-            <MudText>Content One</MudText>
+        <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.PieChartOutline">
+            <MudPaper Class="w-100">
+                <MudText>Content One</MudText>
+            </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
-            <MudText>Content One</MudText>
+            <MudPaper Class="w-100">
+                <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync" 
+                              Variant="Variant.Outlined" Lines="10" AutoGrow="true" />
+            </MudPaper>
         </MudTabPanel>
     </MudTabs>
 }
@@ -77,6 +82,14 @@ else
     private void UpdateExpenses()
     {
         _budget!.Expenses = _expenses.ToList();
+        _hasBudgetChanged = true;
+    }
+
+    private void UpdateNotes(string? notes)
+    {
+        if (_budget!.Notes == notes) return;
+        
+        _budget!.Notes = notes;
         _hasBudgetChanged = true;
     }
     
