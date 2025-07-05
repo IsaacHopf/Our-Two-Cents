@@ -37,8 +37,8 @@ a:hover {
     color: inherit;
 }
 
-.mud-table-root .mud-table-head .mud-table-cell {
-    font-weight: 550;
+th {
+    font-weight: 550 !important;
 }
 
 .mud-table-overflow-y-hidden .mud-table-container {

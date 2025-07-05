@@ -31,8 +31,8 @@ else
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
         <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.PieChartOutline">
-            <MudPaper Class="w-100">
-                <MudText>Content One</MudText>
+            <MudPaper Class="w-100 pa-6">
+                <TotalAmountByCategoriesList Budget="@_budget"/>
             </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
