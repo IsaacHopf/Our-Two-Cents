@@ -8,8 +8,8 @@
                 </MudStack>
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.TotalAmount" Format="C"/>
-        <PropertyColumn Property="x => x.PercentOfIncome" Format="P0"/>
+        <PropertyColumn Title="Total Amount" Property="x => x.TotalAmount" Format="C"/>
+        <PropertyColumn Title="% of Income"  Property="x => x.PercentOfIncome" Format="P0"/>
     </Columns>
 </MudDataGrid>
 
@@ -25,7 +25,7 @@
                 group.First().Category,
                 group.Sum(x => x.Amount),
                 (group.Sum(x => x.Amount) / Budget.TotalIncome)))
-            .OrderByDescending(x => x.PercentOfIncome);
+            .OrderBy(x => x.PercentOfIncome);
     }
 
     private record TotalAmountByCategory(
