@@ -30,9 +30,9 @@ else
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses" 
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
-        <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.PieChartOutline">
+        <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.GroupWork">
             <MudPaper Class="w-100 pa-6">
-                <TotalAmountByCategoriesList Budget="@_budget"/>
+                <TotalAmountByCategoriesGrid Budget="@_budget"/>
             </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
