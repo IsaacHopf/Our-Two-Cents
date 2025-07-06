@@ -32,7 +32,11 @@ else
         </MudTabPanel>
         <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.GroupWork">
             <MudPaper Class="w-100 pa-6">
-                <TotalAmountByCategoriesGrid Budget="@_budget"/>
+                <TotalExpensesByCategoryChart Budget="@_budget" Transactions="@_budget.Expenses"/>
+                @*<MudStack Row="true">
+                    <TotalAmountByCategoriesGrid Budget="@_budget"/>
+                    <TotalExpensesByCategoryChart Transactions="@_budget.Expenses"/>
+                </MudStack>*@
             </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">

@@ -1,0 +1,244 @@
+﻿@using ChartType = MudBlazor.ChartType
+@using ApexCharts
+@using BudgetApp.Pages.Budgets.Components
+
+@*<MudStack Row="true">
+    <MudChart ChartType="ChartType.Pie" 
+              @bind-SelectedIndex="_selectedIndex" Width="300px" Height="300px" 
+              InputLabels="@_inputLabels" 
+              InputData="@_inputData" 
+              ChartOptions="@(new ChartOptions()
+                            {
+                                ChartPalette = _chartPalette,
+                                ShowLegend = false
+                            })"/>
+    
+    <MudDataGrid T="TotalExpensesByCategory" Items="@_totalExpensesByCategory" Elevation="0" Hover="true" Dense="true" Bordered="true" RowClick="@RowClicked"
+                 CurrentPageChanged="@CurrentPageChanged">
+        <Columns>
+            <PropertyColumn Property="x => x.Category" Comparer="@(new CategoryComparer())">
+                <CellTemplate>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                        <span>@context.Item.Category.Name</span>
+                    </MudStack>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Title="Total Amount" Property="x => x.TotalAmount" Format="C"/>
+            <PropertyColumn Title="% of Expense" Property="x => x.PercentOfExpense" Format="P0"/>
+        </Columns>
+    </MudDataGrid>
+</MudStack>*@
+
+<MudStack Row="true">
+    
+    <ApexChart @ref="_chart" TItem="Transaction" Options="@_options" Width="@("300px")" Height="@("300px")">
+        <ApexPointSeries TItem="Transaction" Items="@Transactions"
+                         Name="Total Expenses By Type"
+                         SeriesType="SeriesType.Pie"
+                         XValue="@(x => x.Category.Name)"
+                         YAggregate="@(x => x.Sum(y => y.Amount))"
+                         OrderBy="x => x.Y"
+                         DataPointMutator="SetColors" ShowDataLabels="true"/>
+    </ApexChart>
+    
+    <MudTable T="TotalExpensesByCategory" Items="@_totalExpensesByCategory" OnRowMouseEnter="@RowMouseEnterEvent" OnRowMouseLeave="@(async(args) => await RowMouseLeaveEvent(args))" 
+              Elevation="0" Hover="true" Dense="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>Category</MudTh>
+            <MudTh>Total Amount</MudTh>
+            <MudTh>% of Expenses</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudStack Row="true" AlignItems="AlignItems.Center">
+                    <div style="background-color: @context.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                    <span>@context.Category.Name</span>
+                </MudStack>
+            </MudTd>
+            <MudTd>@context.TotalAmount.ToString("C")</MudTd>
+            <MudTd>@context.PercentOfExpenses.ToString("P0")</MudTd>
+        </RowTemplate>
+    </MudTable>
+    
+</MudStack>
+
+@code {
+    [Parameter] public required Budget Budget { get; set; }
+    [Parameter] public required IEnumerable<Transaction> Transactions { get; set; }
+    
+    private IEnumerable<TotalExpensesByCategory> _totalExpensesByCategory = [];
+    //
+    // private int _selectedIndex = 1;
+    // private string[] _inputLabels = [];
+    // private double[] _inputData = [];
+    // private string[] _chartPalette = [];
+    //
+    // protected override void OnInitialized()
+    // {
+    //     var transactionsGroupedByCategory = Budget.Expenses
+    //         .GroupBy(x => x.Category.Name)
+    //         .OrderBy(x => x.Sum(y => y.Amount))
+    //         .ToList();
+    //     
+    //     _totalExpensesByCategory = transactionsGroupedByCategory
+    //         .Select(group => new TotalExpensesByCategory(
+    //             group.First().Category,
+    //             group.Sum(x => x.Amount),
+    //             group.Sum(x => x.Amount) / Budget.TotalExpenses));
+    //     
+    //     _inputLabels = transactionsGroupedByCategory
+    //         .Select(x => x.Key).ToArray();
+    //     _inputData = transactionsGroupedByCategory
+    //         .Select(x => (double)decimal.Round(x.Sum(y => y.Amount), 2)).ToArray();
+    //     _chartPalette = transactionsGroupedByCategory
+    //         .Select(x => x.First().Category.Color).ToArray();
+    // }
+    //
+    // private void RowClicked(DataGridRowClickEventArgs<TotalExpensesByCategory> args)
+    // {
+    //     _selectedIndex = args.RowIndex;
+    // }
+    
+    private record TotalExpensesByCategory(
+        Category Category, decimal TotalAmount, decimal PercentOfExpenses);
+
+    // protected override void OnInitialized()
+    // {
+    //     _totalAmountsByCategory = Budget.Expenses
+    //         .GroupBy(expense => expense.Category.Name)
+    //         .Select(group => new TotalAmountByCategory(
+    //             group.First().Category,
+    //             group.Sum(x => x.Amount),
+    //             (group.Sum(x => x.Amount) / Budget.TotalIncome)))
+    //         .OrderBy(x => x.PercentOfIncome);
+    // }
+
+    private ApexChart<Transaction>? _chart;
+    private readonly ApexChartOptions<Transaction> _options = new();
+    
+    private const string FontFamily = "'Roboto', 'Helvetica', 'Arial', 'sans-serif'";
+    
+    protected override void OnInitialized()
+    {
+        _totalExpensesByCategory = Budget.Expenses
+            .GroupBy(expense => expense.Category.Name)
+            .Select(group => new TotalExpensesByCategory(
+                group.First().Category,
+                group.Sum(x => x.Amount),
+                group.Sum(x => x.Amount) / Budget.TotalExpenses))
+            .OrderBy(x => x.PercentOfExpenses);
+        
+        // _options.Chart.Selection = new Selection()
+        // {
+        //     Enabled = false,
+        //     Fill = new SelectionFill()
+        //     {
+        //         Opacity = 0
+        //     }
+        // };
+
+        _options.PlotOptions = new PlotOptions()
+        {
+            Pie = new PlotOptionsPie()
+            {
+                ExpandOnClick = false
+            }
+        };
+        
+        _options.States = new States()
+        {
+            Active = new StatesActive()
+            {
+                Filter = new StatesFilter()
+                {
+                    Type = StatesFilterType.lighten
+                }
+            }
+        };
+
+        _options.Stroke = new Stroke()
+        {
+            Show = false
+        };
+
+        _options.Chart = new Chart()
+        {
+            Animations = new Animations()
+            {
+                Speed = 500
+            }
+        };
+        
+        _options.DataLabels = new DataLabels
+        {
+            Formatter = @"function(value, opts) {
+            return Math.round(Number(value)) + '%';}",
+            DropShadow = new DropShadow()
+            {
+                Opacity = 0
+            },
+            Background = new DataLabelsBackground()
+            {
+                ForeColor = "var(--mud-palette-text-primary)",
+                Opacity = 0
+            },
+            Style = new DataLabelsStyle
+            {
+                FontFamily = FontFamily
+            }
+        };
+
+        _options.Legend = new Legend()
+        {
+            Show = false
+        };
+    
+        // _options.Legend = new Legend
+        // {
+        //     Formatter = @"function(seriesName, opts) { 
+        //     return [seriesName, '-', opts.w.globals.series[opts.seriesIndex].toLocaleString('en-US', {style: 'currency',currency: 'USD',})] }",
+        //     FontFamily = FontFamily,
+        //     FontSize = "15px",
+        //     Position = Centered ? LegendPosition.Bottom : LegendPosition.Right,
+        // };
+    
+        _options.Tooltip = new Tooltip
+        {
+            Y = new TooltipY
+            {
+                Formatter = @"function(value, opts) {
+                if (value === undefined) {return '';}
+                return value.toLocaleString('en-US', {style: 'currency',currency: 'USD',});}"
+            },
+            Style = new TooltipStyle
+            {
+                FontFamily = FontFamily
+            }
+        };
+    }
+
+    private async Task RowMouseEnterEvent(TableRowHoverEventArgs<TotalExpensesByCategory> eventArgs)
+    {
+        // var seriesIndex = _totalExpensesByCategory.ToList().IndexOf(eventArgs.Item!);
+        // await _chart!.ToggleDataPointSelectionAsync(seriesIndex, null);
+        await _chart!.HighlightSeriesAsync(eventArgs.Item!.Category.Name);
+    }
+
+    private async Task RowMouseLeaveEvent(TableRowHoverEventArgs<TotalExpensesByCategory> eventArgs)
+    {
+        await _chart!.ResetSeriesAsync(true, true);
+        // var seriesIndex = _totalExpensesByCategory.ToList().IndexOf(eventArgs.Item!);
+        // await _chart!.ToggleDataPointSelectionAsync(seriesIndex, null);
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_chart is not null) await _chart.UpdateOptionsAsync(false, true, true);
+    }
+    
+    private static void SetColors(DataPoint<Transaction> point)
+    {
+        point.FillColor = point.Items.First().Category.Color;
+    }
+}
