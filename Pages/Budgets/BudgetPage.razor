@@ -19,30 +19,26 @@
 }
 else
 {
-    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="40px">
+    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
-            <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" 
-                              Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes" 
+            <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month"
+                              Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
                               OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
         <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
-            <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" 
-                              Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses" 
+            <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month"
+                              Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses"
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
-        <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.GroupWork">
+        <MudTabPanel Text="Categories" Icon="@Icons.Material.Rounded.Category">
             <MudPaper Class="w-100 pa-6">
-                <TotalExpensesByCategoryChart Budget="@_budget" Transactions="@_budget.Expenses"/>
-                @*<MudStack Row="true">
-                    <TotalAmountByCategoriesGrid Budget="@_budget"/>
-                    <TotalExpensesByCategoryChart Transactions="@_budget.Expenses"/>
-                </MudStack>*@
+                <TotalExpensesByCategoryChart Budget="@_budget"/>
             </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
             <MudPaper Class="w-100">
-                <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync" 
-                              Variant="Variant.Outlined" Lines="10" AutoGrow="true" />
+                <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync"
+                              Variant="Variant.Outlined" Lines="10" AutoGrow="true"/>
             </MudPaper>
         </MudTabPanel>
     </MudTabs>

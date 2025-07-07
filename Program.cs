@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ApexCharts;
 using BudgetApp.Services.Repositories;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,44 @@ public class Program
             config.SnackbarConfiguration.ShowCloseIcon = false;
             config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
             config.SnackbarConfiguration.MaximumOpacity = 255;
+        });
+
+        builder.Services.AddApexCharts(e =>
+        {
+            e.GlobalOptions = new ApexChartBaseOptions
+            {
+                Chart = new Chart
+                {
+                    Animations = new Animations
+                    {
+                        Speed = 500
+                    }
+                },
+                Stroke = new Stroke
+                {
+                    Show = false
+                },
+                DataLabels = new DataLabels
+                {
+                    Style = new DataLabelsStyle
+                    {
+                        FontFamily = "'Roboto', 'Helvetica', 'Arial', 'sans-serif'"
+                    },
+                    DropShadow = new DropShadow
+                    {
+                        Opacity = 0
+                    },
+                    Background = new DataLabelsBackground
+                    {
+                        ForeColor = "var(--mud-palette-text-primary)",
+                        Opacity = 0
+                    }
+                },
+                Tooltip = new Tooltip
+                {
+                    Style = new TooltipStyle { FontFamily = "'Roboto', 'Helvetica', 'Arial', 'sans-serif'" }
+                }
+            };
         });
 
         var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
