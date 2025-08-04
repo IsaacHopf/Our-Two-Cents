@@ -1,28 +1,43 @@
 ﻿@using ApexCharts
 
-<MudStack Row="true" StretchItems="StretchItems.End">
+<MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+    <MudToggleIconButton Toggled="@_showIncome" ToggledChanged="@OnShowIncomeChangedAsync" Size="@MudBlazor.Size.Small"
+                         Icon="@Icons.Material.Rounded.MoneyOff" Color="@MudBlazor.Color.Error"
+                         ToggledIcon="@Icons.Material.Rounded.AttachMoney" ToggledColor="@MudBlazor.Color.Success"/>
+    @if (!_showIncome)
+    {
+        <MudText>Total Expenses</MudText>
+    }
+    else
+    {
+        <MudText>Total Expenses Over Income</MudText>
+    }
+</MudStack>
+
+<MudStack Row="true">
     
+    @* Reserve horizontal screen space for chart before it loads. *@
     @if (!_chartMounted)
     {
-        <div Style="width: @ChartDiameter; height: 1px;"></div>
+        <MudSkeleton SkeletonType="SkeletonType.Circle" Width="@ChartDiameter" Height="@ChartDiameter" Class="ma-2"/>
     }
     
-    <ApexChart @ref="_chart" TItem="Transaction" Options="@_options" Width="@ChartDiameter" Height="@ChartDiameter" OnMounted="@OnChartMounted">
-        <ApexPointSeries TItem="Transaction" Items="@Budget.Expenses"
+    <ApexChart @ref="_chart" TItem="CategoryWithAmount" Options="@_options" 
+               Width="@ChartDiameter" Height="@ChartDiameter" OnMounted="@OnChartMounted">
+        <ApexPointSeries TItem="CategoryWithAmount" Items="@_categories"
                          SeriesType="SeriesType.Pie"
                          XValue="@(x => x.Category.Name)"
-                         YAggregate="@(x => x.Sum(y => y.Amount))"
-                         OrderBy="x => x.Y!"
+                         YValue="@(x => x.TotalAmount)"
                          DataPointMutator="SetColors"
                          ShowDataLabels="true"/>
     </ApexChart>
     
-    <MudTable T="TotalExpensesByCategory" Items="@_totalExpensesByCategory" OnRowMouseEnter="@OnTableRowMouseEnter"
+    <MudTable T="CategoryWithAmount" Items="@_categories" OnRowMouseEnter="@OnTableRowMouseEnter"
               Elevation="0" Hover="true" Dense="true" Bordered="true" @onmouseleave="OnTableMouseLeave">
         <HeaderContent>
             <MudTh>Category</MudTh>
             <MudTh>Total Amount</MudTh>
-            <MudTh>% of Expenses</MudTh>
+            <MudTh>Percent</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -32,7 +47,14 @@
                 </MudStack>
             </MudTd>
             <MudTd>@context.TotalAmount.ToString("C")</MudTd>
-            <MudTd>@context.PercentOfExpenses.ToString("P0")</MudTd>
+            @if (!_showIncome)
+            {
+                <MudTd>@context.PercentOfExpenses.ToString("P0")</MudTd>
+            }
+            else
+            {
+                <MudTd>@context.PercentOfIncome.ToString("P0")</MudTd>
+            }
         </RowTemplate>
     </MudTable>
 
@@ -41,23 +63,23 @@
 @code {
     [Parameter] public required Budget Budget { get; set; }
     [Parameter] public string ChartDiameter { get; set; } = "310px";
-    
-    private IEnumerable<TotalExpensesByCategory> _totalExpensesByCategory = [];
 
-    private ApexChart<Transaction>? _chart;
-    private readonly ApexChartOptions<Transaction> _options = new();
+    private bool _showIncome = false;
+    
+    private List<CategoryWithAmount> _categories = [];
+
+    private ApexChart<CategoryWithAmount>? _chart;
+    private readonly ApexChartOptions<CategoryWithAmount> _options = new();
     private bool _chartMounted = false;
     
     protected override void OnInitialized()
     {
-        _totalExpensesByCategory = Budget.Expenses
-            .GroupBy(expense => expense.Category.Name)
-            .Select(group => new TotalExpensesByCategory(
-                group.First().Category,
-                group.Sum(x => x.Amount),
-                group.Sum(x => x.Amount) / Budget.TotalExpenses))
-            .OrderBy(x => x.PercentOfExpenses);
+        SetOptions();
+        SetCategories();
+    }
 
+    private void SetOptions()
+    {
         _options.Legend = new Legend
         {
             Show = false
@@ -88,14 +110,42 @@
         };
     }
 
-    private async Task OnTableRowMouseEnter(TableRowHoverEventArgs<TotalExpensesByCategory> eventArgs)
+    private void SetCategories()
     {
-        await _chart!.HighlightSeriesAsync(eventArgs.Item!.Category.Name);
+        _categories = Budget.Expenses
+            .GroupBy(expense => expense.Category.Name)
+            .Select(group => new CategoryWithAmount(
+                group.First().Category,
+                group.Sum(x => x.Amount),
+                group.Sum(x => x.Amount) / Budget.TotalExpenses,
+                group.Sum(x => x.Amount) / Budget.TotalIncome))
+            .OrderBy(x => x.TotalAmount)
+            .ToList();
+        
+        if (_showIncome && Budget.TotalIncome > Budget.TotalExpenses)
+            _categories.Add(new CategoryWithAmount(
+                new Category("Remaining Income", "#CFD8DC"),
+                Budget.TotalIncome - Budget.TotalExpenses,
+                0,
+                (Budget.TotalIncome - Budget.TotalExpenses) / Budget.TotalIncome));
+    }
+
+    private async Task OnShowIncomeChangedAsync(bool changedShowIncome)
+    {
+        _showIncome = changedShowIncome;
+        SetCategories();
+        
+        if (_chart is not null) await _chart.UpdateOptionsAsync(true, true, true);
+    }
+
+    private async Task OnTableRowMouseEnter(TableRowHoverEventArgs<CategoryWithAmount> eventArgs)
+    {
+        if (_chart is not null) await _chart.HighlightSeriesAsync(eventArgs.Item!.Category.Name);
     }
 
     private async Task OnTableMouseLeave()
     {
-        await _chart!.ResetSeriesAsync(true, false);
+        if (_chart is not null) await _chart?.ResetSeriesAsync(true, false)!;
     }
 
     private void OnChartMounted()
@@ -106,15 +156,14 @@
     
     protected override async Task OnParametersSetAsync()
     {
-        if (_chart is not null) 
-            await _chart.UpdateOptionsAsync(false, true, true);
+        if (_chart is not null) await _chart.UpdateOptionsAsync(false, true, true);
     }
     
-    private static void SetColors(DataPoint<Transaction> point)
+    private static void SetColors(DataPoint<CategoryWithAmount> point)
     {
         point.FillColor = point.Items.First().Category.Color;
     }
     
-    private record TotalExpensesByCategory(
-        Category Category, decimal TotalAmount, decimal PercentOfExpenses);
+    private record CategoryWithAmount(
+        Category Category, decimal TotalAmount, decimal PercentOfExpenses, decimal PercentOfIncome);
 }
