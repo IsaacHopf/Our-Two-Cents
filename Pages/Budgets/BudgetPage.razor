@@ -6,9 +6,10 @@
 @page "/budgets/{budgetName}"
 
 <MudStack Row="true" Spacing="6">
-    <ReadOnlyCurrencyTextField Value="@_budget?.TotalIncome" Label="Total Income"/>
+    <ReadOnlyCurrencyTextField Value="@_budget?.TotalIncome" Label="Total Income" />
     <ReadOnlyCurrencyTextField Value="@(_budget?.TotalExpenses * -1)" Label="Total Expenses"/>
     <ReadOnlyCurrencyTextField Value="@_budget?.Net" Label="Net"/>
+    <div style="width: 75%;"></div>
 </MudStack>
 
 @if (_budget is null)
