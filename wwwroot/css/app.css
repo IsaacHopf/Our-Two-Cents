@@ -49,4 +49,12 @@ th {
     overflow-y: hidden !important;
 }
 
+.mud-tabs-panels {
+    background-color: var(--mud-palette-surface);
+}
+
+.mud-input-underline-none .mud-input-underline:before, .mud-input-underline-none .mud-input-underline:after {
+    content: unset !important;
+}
+
 /* endregion */

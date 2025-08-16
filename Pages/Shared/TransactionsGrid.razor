@@ -4,132 +4,132 @@
 @inject IScrollManager ScrollManager
 @inject ISnackbar Snackbar
 
-    <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-                 ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="1" 
-                 Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-1 w-100">
+<MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
+             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="1" 
+             Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-1 w-100"
+             Style="@(Income ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
     
-        <ToolBarContent>
-            @if (Income)
+    <ToolBarContent>
+        @if (Income)
+        {
+            <MudTooltip Text="Add Income (Enter)" Delay="650">
+                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success" Class="me-4"/>
+            </MudTooltip>
+            if (FixedTransactions is not null)
             {
-                <MudTooltip Text="Add Income (Enter)" Delay="650">
-                    <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success" Class="me-4"/>
+                <MudTooltip Text="Add Fixed Income" Delay="650">
+                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"/>
                 </MudTooltip>
-                if (FixedTransactions is not null)
-                {
-                    <MudTooltip Text="Add Fixed Income" Delay="650">
-                        <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"/>
-                    </MudTooltip>
-                }
             }
-            else
+        }
+        else
+        {
+            <MudTooltip Text="Add Expense (Enter)" Delay="650">
+                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error" Class="me-4"/>
+            </MudTooltip>
+            if (FixedTransactions is not null)
             {
-                <MudTooltip Text="Add Expense (Enter)" Delay="650">
-                    <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error" Class="me-4"/>
+                <MudTooltip Text="Add Fixed Expenses" Delay="650">
+                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"/>
                 </MudTooltip>
-                if (FixedTransactions is not null)
-                {
-                    <MudTooltip Text="Add Fixed Expenses" Delay="650">
-                        <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"/>
-                    </MudTooltip>
-                }
-                <div class="ms-auto">
-                    <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
-                        <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
-                            <MudStack Row="true" Spacing="0">
-                                <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
-                                @if (_showChart)
-                                {
-                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
-                                }
-                                else
-                                {
-                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
-                                }
-                            </MudStack>
-                        </MudButton>
-                        @* <MudIconButton OnClick="@(() => _showChart = !_showChart)" Icon="@Icons.Material.Rounded.PieChart" Color="@Color.Default"/> *@
-                    </MudTooltip>
-                </div>
             }
-        </ToolBarContent>
+            <div class="ms-auto">
+                <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
+                    <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
+                        <MudStack Row="true" Spacing="0">
+                            <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
+                            @if (_showChart)
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
+                            }
+                        </MudStack>
+                    </MudButton>
+                </MudTooltip>
+            </div>
+        }
+    </ToolBarContent>
     
-        <Columns>
-            <PropertyColumn Property="x => x.Source" Required="false"/>
-            <PropertyColumn Property="x => x.Amount" Format="C">
+    <Columns>
+        <PropertyColumn Property="x => x.Source" Required="false"/>
+        <PropertyColumn Property="x => x.Amount" Format="C">
+            <EditTemplate>
+                <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
+                                 ValueChanged="x => 
+                                 { 
+                                     context.Item.Amount = x; 
+                                     _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
+                                 }"/>
+            </EditTemplate>
+        </PropertyColumn>
+        @if (!Income)
+        {
+            <PropertyColumn Property="x => x.Category" Comparer="@(new CategoryComparer())">
+                <CellTemplate>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                        <span>@context.Item.Category.Name</span>
+                    </MudStack>
+                </CellTemplate>
                 <EditTemplate>
-                    <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
-                                     ValueChanged="x => 
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
+                        <MudAutocomplete T="Category" Value="@context.Item.Category" 
+                                         ValueChanged="x => 
+                                         { 
+                                             context.Item.Category = x;
+                                             _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
+                                         }"
+                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectValueOnTab="true" Required="true" Clearable="true">
+                            <ItemTemplate Context="e">
+                                <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
+                            </ItemTemplate>
+                        </MudAutocomplete>
+                    </MudStack>
+                </EditTemplate>
+            </PropertyColumn>
+        }
+        <PropertyColumn Property="x => x.Date" Format="MMM. d">
+            <EditTemplate>
+                <MudNumericField T="int?" Min="1" Value="context.Item.Date?.Day"
+                                 ValueChanged="x => 
+                                 { 
+                                     try 
                                      { 
-                                         context.Item.Amount = x; 
+                                         context.Item.Date = x is null ? null : new DateTime(Year, Month, x.Value); 
                                          _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
-                                     }"/>
-                </EditTemplate>
-            </PropertyColumn>
-            @if (!Income)
-            {
-                <PropertyColumn Property="x => x.Category" Comparer="@(new CategoryComparer())">
-                    <CellTemplate>
-                        <MudStack Row="true" AlignItems="AlignItems.Center">
-                            <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                            <span>@context.Item.Category.Name</span>
-                        </MudStack>
-                    </CellTemplate>
-                    <EditTemplate>
-                        <MudStack Row="true" AlignItems="AlignItems.Center">
-                            <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
-                            <MudAutocomplete T="Category" Value="@context.Item.Category" 
-                                             ValueChanged="x => 
-                                             { 
-                                                 context.Item.Category = x;
-                                                 _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
-                                             }"
-                                             SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectValueOnTab="true" Required="true" Clearable="true">
-                                <ItemTemplate Context="e">
-                                    <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
-                                </ItemTemplate>
-                            </MudAutocomplete>
-                        </MudStack>
-                    </EditTemplate>
-                </PropertyColumn>
-            }
-            <PropertyColumn Property="x => x.Date" Format="MMM. d">
-                <EditTemplate>
-                    <MudNumericField T="int?" Min="1" Value="context.Item.Date?.Day"
-                                     ValueChanged="x => 
+                                     }
+                                     catch (ArgumentOutOfRangeException) 
                                      { 
-                                         try 
-                                         { 
-                                             context.Item.Date = x is null ? null : new DateTime(Year, Month, x.Value); 
-                                             _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
-                                         }
-                                         catch (ArgumentOutOfRangeException) 
-                                         { 
-                                             context.Item.Date = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
-                                         } 
-                                     }"/>
-                </EditTemplate>
-            </PropertyColumn>
-            <TemplateColumn>
-                <EditTemplate>
-                    @if (Income)
-                    {
-                        <MudTooltip Text="Delete Income" Delay="650">
-                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                           Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
-                        </MudTooltip>
-                    }
-                    else
-                    {
-                        <MudTooltip Text="Delete Expense" Delay="650">
-                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                           Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
-                        </MudTooltip>
-                    }
-                </EditTemplate>
-            </TemplateColumn>
-        </Columns>
+                                         context.Item.Date = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
+                                     } 
+                                 }"/>
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn>
+            <EditTemplate>
+                @if (Income)
+                {
+                    <MudTooltip Text="Delete Income" Delay="650">
+                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudTooltip Text="Delete Expense" Delay="650">
+                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                    </MudTooltip>
+                }
+            </EditTemplate>
+        </TemplateColumn>
+    </Columns>
     
-    </MudDataGrid>
+</MudDataGrid>
 
 @if (_showChart)
 {
