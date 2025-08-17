@@ -8,7 +8,7 @@
     
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
              ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0"
-             Class="mud-data-grid-edit-onclick w-100"
+             Class="w-100 mud-data-grid-edit-onclick"
              Style="@(Income ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
     
     <ToolBarContent>
@@ -82,13 +82,14 @@
                 <EditTemplate>
                     <MudStack Row="true" AlignItems="AlignItems.Center">
                         <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
-                        <MudAutocomplete T="Category" Value="@context.Item.Category" 
+                        @* Modal must be false or else edit mode will be disabled when clicking on MudAutocomplete. *@
+                        <MudAutocomplete T="Category" Value="@context.Item.Category" Modal="false"
                                          ValueChanged="x => 
                                          { 
                                              context.Item.Category = x;
                                              _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
                                          }"
-                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectValueOnTab="true" Required="true" Clearable="true">
+                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectOnActivation="true" SelectValueOnTab="true" Required="true">
                             <ItemTemplate Context="e">
                                 <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
                             </ItemTemplate>
@@ -256,7 +257,6 @@
         {
             _editable = false;
             await OnDisableEdit.InvokeAsync();
-            StateHasChanged();
         }
     }
 

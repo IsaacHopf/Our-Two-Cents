@@ -131,7 +131,7 @@
                 group.First().Category,
                 group.Sum(x => x.Amount),
                 group.Sum(x => x.Amount) / Budget.TotalExpenses,
-                group.Sum(x => x.Amount) / Budget.TotalIncome))
+                Budget.TotalIncome == 0 ? 0 : group.Sum(x => x.Amount) / Budget.TotalIncome))
             .OrderBy(x => x.TotalAmount)
             .ToList();
         
