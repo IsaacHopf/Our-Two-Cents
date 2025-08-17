@@ -5,13 +5,17 @@
 
 @page "/budgets/{budgetName}"
 
-<MudStack Row="true" Spacing="6">
-    <ReadOnlyCurrencyTextField Value="@_budget?.TotalIncome" Label="Total Income" />
-    <ReadOnlyCurrencyTextField Value="@(_budget?.TotalExpenses * -1)" Label="Total Expenses"/>
-    <ReadOnlyCurrencyTextField Value="@_budget?.Net" Label="Net"/>
-    <div style="width: 100%;"></div>
-</MudStack>
+<MudStack StretchItems="StretchItems.End" Spacing="0">
+    
+<MudPaper Square="true" Elevation="0" Style="height: 56px; width: 100%; background-color: #CFD8DC; display: flex; align-items: center; padding: 24px;">
+    <MudStack Row="true">
+        <MudText Typo="Typo.h5">@BudgetName</MudText>
+        <MudText Typo="Typo.h6" Class="ms-auto">@($"{@_budget?.TotalIncome} - {_budget?.TotalExpenses} = {_budget?.Net}")</MudText>
+    </MudStack>
+</MudPaper>
 
+<div class="pa-6">
+    
 @if (_budget is null)
 {
     <MudStack AlignItems="AlignItems.Center">
@@ -20,18 +24,18 @@
 }
 else
 {
-    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6">
-        <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
+    <MudTabs Rounded="true" Elevation="1" ApplyEffectsToContainer="true" MinimumTabWidth="96px">
+        <MudTabPanel Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
                               OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
-        <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
+        <MudTabPanel Icon="@Icons.Material.Rounded.MoneyOff">
             <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses"
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
-        <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
+        <MudTabPanel Icon="@Icons.Material.Rounded.Notes">
             <MudPaper Class="w-100 pa-6">
                 <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync"
                               Variant="Variant.Outlined" Lines="10" AutoGrow="true"/>
@@ -39,6 +43,8 @@ else
         </MudTabPanel>
     </MudTabs>
 }
+</div>
+</MudStack>
 
 @code {
     [Parameter] public required string BudgetName { get; set; }

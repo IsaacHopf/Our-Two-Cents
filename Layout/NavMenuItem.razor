@@ -1,0 +1,12 @@
+﻿<MudTooltip Text="@Text" Delay="100">
+    <MudNavLink href="@Href" style="width: 56px; height: 56px; padding: unset;">
+        <MudIcon Icon="@Icon" Size="Size.Medium"/>
+    </MudNavLink>
+</MudTooltip>
+
+@code 
+{
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string? Text { get; set; }
+}

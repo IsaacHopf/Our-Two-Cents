@@ -1,6 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager NavigationManager
-@using System.Globalization
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="@_darkMode"/>
 <MudPopoverProvider/>
@@ -8,22 +6,71 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
+    <MudStack Row="true" Class="h-100" StretchItems="StretchItems.End" Spacing="0">
+        
+        <MudPaper Elevation="1" Style="height: 100%; width: 56px; background-color: #CFD8DC" Square="true">
+            <div style="width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                <MudIcon Icon="@Icons.Material.Rounded.SupervisedUserCircle" Size="Size.Large" Color="Color.Primary"/>
+            </div>
+            <MudNavMenu>
+                <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
+                <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
+                <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed Budget"/>
+                <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
+            </MudNavMenu>
+        </MudPaper>
+        
+        <div>
+            <ErrorBoundary @ref="@_errorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    <Error Exception="@context" ErrorBoundary="@_errorBoundary"/>
+                </ErrorContent>
+            </ErrorBoundary>
+        </div>
+        
+    </MudStack>
     
-    <MudDrawer @bind-Open="@_drawerOpen" Color="Color.Secondary">
-        <MudDrawerHeader>
-            <MudIcon Icon="@Icons.Material.Filled.SupervisedUserCircle"/>
-            <MudText Typo="Typo.h6">Our Two Cents</MudText>
-        </MudDrawerHeader>
-        <hr/>
+    
+    
+    
+    
+    @*<MudDrawerContainer style="height: 100%;">
+        <MudDrawer Open="@false" Fixed="@false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="@true" Breakpoint="Breakpoint.None">
+            <NavMenu/>
+            $1$<MudPaper Square="true" Elevation="1">
+            <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
+            <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
+            <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed Budget"/>
+            <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
+            <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Edge="Edge.End"
+                           Color="Color.Inherit" Size="Size.Small" Class="opacity-50 mt-auto"/>
+        </MudPaper>#1#
+        </MudDrawer>
+
+        <div class="pa-6">
+            <ErrorBoundary @ref="@_errorBoundary">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    <Error Exception="@context" ErrorBoundary="@_errorBoundary"/>
+                </ErrorContent>
+            </ErrorBoundary>
+        </div>
+    </MudDrawerContainer>*@
+
+    
+    
+    
+    
+    @*<MudDrawer Open="true">
         <NavMenu/>
+        <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Edge="Edge.End"
+                       Color="Color.Inherit" Size="Size.Small" Class="opacity-50 mt-auto"/>
     </MudDrawer>
-    
-    <MudAppBar Dense="true" Color="Color.Primary">
-        <MudIconButton OnClick="@ToggleDrawerOpen" Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit" Edge="Edge.Start"/>
-        <MudText Typo="Typo.h6" Class="ms-3">@BuildBreadcrumbTrail()</MudText>
-        <MudSpacer/>
-        <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Color="Color.Inherit" Edge="Edge.End" Size="Size.Small" Class="opacity-50"/>
-    </MudAppBar>
     
     <MudMainContent>
         <div class="pa-6">
@@ -36,20 +83,13 @@
                 </ErrorContent>
             </ErrorBoundary>
         </div>
-    </MudMainContent>
-    
+    </MudMainContent>*@
+
 </MudLayout>
 
 @code 
 {
     private ErrorBoundary? _errorBoundary;
-
-    private bool _drawerOpen = true;
-
-    private void ToggleDrawerOpen()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
 
     private bool _darkMode = false;
     private string _darkModeIcon = Icons.Material.Rounded.DarkMode;
@@ -62,34 +102,15 @@
             : Icons.Material.Rounded.DarkMode;
     }
 
-    private string BuildBreadcrumbTrail()
-    {
-        var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        uri = Uri.UnescapeDataString(uri);
-        uri = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(uri);
-        uri = uri.Replace("/", "  /  ").Replace("-", " ");
-        return uri;
-    }
-
     private readonly MudTheme _theme = new()
     {
         PaletteLight = new PaletteLight
         {
-            Primary = Colors.Blue.Darken3,
-            Secondary = Colors.Blue.Darken4,
-            Tertiary = Colors.Shades.White,
-            Surface = Colors.Gray.Lighten5,
-            Success = Colors.Green.Default,
-            Error = Colors.Red.Darken1
+            Primary = Colors.Blue.Darken4
         },
         PaletteDark = new PaletteDark
         {
-            Primary = Colors.Blue.Darken1,
-            Secondary = Colors.Blue.Darken3,
-            Tertiary = Colors.Shades.White,
-            Background = Colors.BlueGray.Default,
-            Surface = Colors.BlueGray.Darken1,
-            TextPrimary = Colors.Gray.Lighten4
+            Primary = Colors.Blue.Darken1
         }
     };
 }

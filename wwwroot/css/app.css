@@ -1,6 +1,21 @@
 /* region MainLayout */
 
-.mud-drawer-header {
+html, body, #app {
+    height: 100%;
+}
+
+.mud-nav-item a {
+    padding: unset;
+    align-items: center;
+    justify-content: center;
+}
+
+.mud-nav-item .mud-nav-link-text{
+    margin: unset;
+    width: unset;
+}
+
+/*.mud-drawer-header {
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -15,27 +30,31 @@
 
 .mud-drawer hr {
     margin: 0 8px;
-}
+}*/
+
+.
 
 /* endregion */
 
 /* region NavMenu */
 
-.mud-nav-link:hover {
+/*.mud-nav-link:hover {
     color: var(--mud-palette-primary-text);
 }
 
 .mud-nav-link-expand-icon {
     fill: var(--mud-palette-primary-text) !important;
-}
+}*/
 
 /* endregion */
 
 /* region General */
 
+/*
 a:hover {
     color: inherit;
 }
+*/
 
 th {
     font-weight: 550 !important;
