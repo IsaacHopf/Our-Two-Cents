@@ -1,0 +1,106 @@
+﻿@using ApexCharts
+
+@* Reserve screen space for chart before it loads. *@
+@if (!_chartMounted)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="@Width" Height="@Height"/>
+}
+
+<ApexChart @ref="_chart" TItem="Budget" Options="@_options" Width="@Width" Height="@Height" OnMounted="@OnChartMounted">
+    <ApexPointSeries TItem="Budget" Items="@Budgets" Name="Total Income" SeriesType="SeriesType.Line"
+                     XValue="@(x => x.Name)" YValue="@(x => x.TotalIncome)" ShowDataLabels />
+    <ApexPointSeries TItem="Budget" Items="@Budgets" Name="Net" SeriesType="SeriesType.Line"
+                     XValue="@(x => x.Name)" YValue="@(x => x.Net)" ShowDataLabels />
+    <ApexPointSeries TItem="Budget" Items="@Budgets" Name="Total Expenses" SeriesType="SeriesType.Line"
+                     XValue="@(x => x.Name)" YValue="@(x => -x.TotalExpenses)" ShowDataLabels />
+</ApexChart>
+
+@code {
+    [Parameter] public required IEnumerable<Budget> Budgets { get; set; }
+    [Parameter] public string Width { get; set; } = "700px";
+    [Parameter] public string Height { get; set; } = "325px";
+
+    private ApexChart<Budget>? _chart;
+    private readonly ApexChartOptions<Budget> _options = new();
+    private bool _chartMounted = false;
+
+    private const string CurrencyFormatter = 
+        @"function(value, opts) {
+            if (value === undefined) {
+                return '';
+            }
+            return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+        }";
+
+    protected override void OnInitialized()
+    {
+        _options.Colors = ["#7dc9c2", "#efba1e", "#f176a0"];
+        _options.Chart = new Chart
+        {
+            Toolbar = new Toolbar
+            {
+                Show = false
+            },
+            Selection = new Selection
+            {
+                Enabled = false
+            },
+            Zoom = new Zoom
+            {
+                Enabled = false
+            }
+        };
+        _options.Legend = new Legend
+        {
+            Labels = new LegendLabels
+            {
+                Colors = "var(--mud-palette-text-primary)"
+            }
+        };
+        _options.DataLabels = new DataLabels
+        {
+            Formatter = CurrencyFormatter
+        };
+        _options.Tooltip = new Tooltip
+        {
+            Enabled = true,
+            Theme = Mode.Dark
+        };
+        _options.Yaxis =
+        [
+            new YAxis
+            {
+                Labels = new YAxisLabels
+                {
+                    Formatter = CurrencyFormatter,
+                    Style = new AxisLabelStyle
+                    {
+                        Colors = "var(--mud-palette-text-primary)"
+                    }
+                }
+            }
+        ];
+        _options.Xaxis = new XAxis
+        {
+            Labels = new XAxisLabels
+            {
+                Style = new AxisLabelStyle
+                {
+                    Colors = "var(--mud-palette-text-primary)"
+                }
+            }
+        };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Budgets = Budgets.OrderBy(x => x.Year).ThenBy(x => x.Month);
+        if (_chart is not null) await _chart.UpdateOptionsAsync(false, true, true);
+    }
+
+    private void OnChartMounted()
+    {
+        _chartMounted = true;
+        StateHasChanged();
+    }
+}

@@ -17,4 +17,6 @@ public class Budget(int month, int year)
     public decimal TotalExpenses => Expenses.Sum(e => e.Amount);
     public decimal Net => TotalIncome - TotalExpenses;
     public string? Notes { get; set; }
+    
+    public override string ToString() => Name;
 }

@@ -1,0 +1,113 @@
+﻿@inject BudgetsRepository BudgetsRepository
+
+@page "/analytics"
+@using BudgetApp.Pages.Reports.Components
+
+<MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
+
+<MudText Typo="Typo.h4" Class="mb-4">Analytics</MudText>
+
+@if (_budgets is null)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudStack Row="true">
+        <MudSelect Label="Budgets" @bind-SelectedValues="@_selectedBudgets" MultiSelection="true" SelectAll="true" Clearable="true"
+                   Dense="true" Margin="Margin.Dense" Variant="Variant.Filled">
+            @foreach (var budget in _budgets)
+            {
+                <MudSelectItem Value="@budget">@budget.Name</MudSelectItem>
+            }
+        </MudSelect>
+        @if (_selectedBudgets.Any())
+        {
+            <MudStack Row="true" Class="ms-auto">
+                <ReadOnlyCurrencyTextField Label="Average Income" Value="@_selectedBudgets.Average(x => x.TotalIncome)"/>
+                <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(-_selectedBudgets.Average(x => x.TotalExpenses))"/>
+                <ReadOnlyCurrencyTextField Label="Average Net" Value="@_selectedBudgets.Average(x => x.Net)"/>
+            </MudStack>
+        }
+    </MudStack>
+    
+    @if (_selectedBudgets.Any())
+    {
+        <MudStack StretchItems="StretchItems.End" Class="h-100 mt-1" Style="overflow-y: hidden" Spacing="0">
+            
+            <div>
+                <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650">
+                    <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text" Size="Size.Small">
+                        <MudStack Row="true" Spacing="0">
+                            <MudIcon Icon="@Icons.Material.Rounded.AreaChart" Color="Color.Default"/>
+                            @if (_showChart)
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Default"/>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Default"/>
+                            }
+                        </MudStack>
+                    </MudButton>
+                </MudTooltip>
+            </div>
+            
+            @if (_showChart)
+            {
+                <BudgetTotalsChart Budgets="_selectedBudgets" Height="40%" Width="100%"/>
+            }
+
+            <MudDataGrid Items="@_selectedBudgets" Hover="true" Dense="true" Bordered="true" Elevation="0" 
+                         Class="mt-1 mud-table-overflow-hidden-container" Style="background-color: var(--mud-palette-primary-hover);">
+                <Columns>
+                    <HierarchyColumn EnableHeaderToggle="true"/>
+                    <PropertyColumn Title="Budget" Property="x => x.Name"/>
+                    <PropertyColumn Title="Total Income" Property="x => x.TotalIncome" Format="C"/>
+                    <PropertyColumn Title="Total Expenses" Property="x => -x.TotalExpenses" Format="C"/>
+                    <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
+                </Columns>
+                <ChildRowContent>
+                    <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 350px;">
+                        <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
+                        <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
+                            <Columns>
+                                <PropertyColumn Property="x => x.Source" />
+                                <PropertyColumn Property="x => x.Amount" Format="C" />
+                                <PropertyColumn Property="x => x.Category" Comparer="@(new CategoryComparer())">
+                                    <CellTemplate Context="cellContext">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                                            <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                            <span>@cellContext.Item.Category.Name</span>
+                                        </MudStack>
+                                    </CellTemplate>
+                                </PropertyColumn>
+                            </Columns>
+                        </MudDataGrid>
+                    </MudStack>
+                </ChildRowContent>
+            </MudDataGrid>
+        </MudStack>
+    }
+}
+
+</MudStack>
+
+@code 
+{
+    private IEnumerable<Budget>? _budgets;
+    private IEnumerable<Budget> _selectedBudgets = [];
+    private bool _showChart = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _budgets = await BudgetsRepository.Query()
+            .OrderByDescending(x => x.Year)
+            .ThenByDescending(x => x.Month)
+            .ToEnumerableAsync();
+
+        _selectedBudgets = _budgets.Take(6);
+    }
+}

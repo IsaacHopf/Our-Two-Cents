@@ -2,23 +2,26 @@
 
 <div>
     
-<MudStack Row="true" AlignItems="AlignItems.Center" Justify="@(IsTableBelowChart ? Justify.Center : Justify.FlexStart)" Spacing="1" Class="mb-3">
-    <MudToggleIconButton Toggled="@_showIncome" ToggledChanged="@OnShowIncomeChangedAsync" Size="@MudBlazor.Size.Small"
-                         Icon="@Icons.Material.Rounded.MoneyOff" Color="@MudBlazor.Color.Error"
-                         ToggledIcon="@Icons.Material.Rounded.AttachMoney" ToggledColor="@MudBlazor.Color.Success"/>
-    @if (!_showIncome)
-    {
-        <MudText Typo="Typo.h6">Total Expenses</MudText>
-    }
-    else
-    {
-        <MudText Typo="Typo.h6">Total Expenses Over Income</MudText>
-    }
-</MudStack>
+@if (!HideTitle)
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="@(IsTableBelowChart ? Justify.Center : Justify.FlexStart)" Spacing="1" Class="mb-3">
+        <MudToggleIconButton Toggled="@_showIncome" ToggledChanged="@OnShowIncomeChangedAsync" Size="@MudBlazor.Size.Small"
+                             Icon="@Icons.Material.Rounded.MoneyOff" Color="@MudBlazor.Color.Error"
+                             ToggledIcon="@Icons.Material.Rounded.AttachMoney" ToggledColor="@MudBlazor.Color.Success"/>
+        @if (!_showIncome)
+        {
+            <MudText Typo="Typo.h6">Total Expenses</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Total Expenses Over Income</MudText>
+        }
+    </MudStack>
+}
 
 <MudStack Row="@(!IsTableBelowChart)" AlignItems="@(IsTableBelowChart ? AlignItems.Center : AlignItems.Start)">
     
-    @* Reserve horizontal screen space for chart before it loads. *@
+    @* Reserve screen space for chart before it loads. *@
     @if (!_chartMounted)
     {
         <MudSkeleton SkeletonType="SkeletonType.Circle" Width="@ChartDiameter" Height="@ChartDiameter" Class="ma-2"/>
@@ -68,6 +71,7 @@
     [Parameter] public required Budget Budget { get; set; }
     [Parameter] public string ChartDiameter { get; set; } = "310px";
     [Parameter] public bool IsTableBelowChart { get; set; } = false;
+    [Parameter] public bool HideTitle { get; set; } = false;
 
     private bool _showIncome = false;
     
@@ -85,6 +89,10 @@
 
     private void SetOptions()
     {
+        _options.Stroke = new Stroke
+        {
+            Show = false
+        };
         _options.Legend = new Legend
         {
             Show = false

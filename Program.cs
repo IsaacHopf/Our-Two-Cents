@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using ApexCharts;
 using BudgetApp.Services.Repositories;
@@ -17,6 +18,7 @@ public class Program
     {
         var builder = PhotinoBlazorAppBuilder.CreateDefault(args);
         
+        // Setup MudBlazor.
         builder.Services.AddMudServices(config =>
         {
             config.SnackbarConfiguration.VisibleStateDuration = 2000;
@@ -28,6 +30,7 @@ public class Program
             config.SnackbarConfiguration.MaximumOpacity = 255;
         });
 
+        // Setup ApexCharts.
         builder.Services.AddApexCharts(e =>
         {
             e.GlobalOptions = new ApexChartBaseOptions
@@ -38,10 +41,6 @@ public class Program
                     {
                         Speed = 500
                     }
-                },
-                Stroke = new Stroke
-                {
-                    Show = false
                 },
                 DataLabels = new DataLabels
                 {
@@ -66,7 +65,10 @@ public class Program
             };
         });
 
+        // Setup Configuration.
         var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
+        
+        // Setup Database.
         var cosmosClient = new CosmosClient(config["CosmosConnectionString"],
             new CosmosClientOptions
             {
@@ -80,6 +82,16 @@ public class Program
         builder.Services.AddSingleton(new FixedBudgetRepository(cosmosClient, config));
         builder.Services.AddSingleton(new CategoriesRepository(cosmosClient, config));
 
+        // Set Culture to show (-) for negative numbers.
+        if (Thread.CurrentThread.CurrentCulture.Name.Equals("en-US", StringComparison.Ordinal)
+            && Thread.CurrentThread.CurrentCulture.NumberFormat.CurrencyNegativePattern == 0)
+        {
+            var currentCultureInfo = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+            currentCultureInfo.NumberFormat.CurrencyNegativePattern = 1;
+            Thread.CurrentThread.CurrentCulture = currentCultureInfo;
+        }
+
+        // Build App
         builder.RootComponents.Add<App>("#app");
 
         var app = builder.Build();
