@@ -3,7 +3,9 @@
 @inject FixedBudgetRepository FixedBudgetRepository;
 @inject ISnackbar Snackbar
 
-@page "/configuration/categories"
+@page "/categories"
+
+<MudText Typo="Typo.h4" Class="mb-4">Categories</MudText>
 
 @if (_categories is null)
 {
@@ -15,7 +17,7 @@ else
 {
     <MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.OnRowClick"
                  CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
-                 Hover="true" Bordered="true" Dense="true" Elevation="2" Class="mud-table-overflow-y-hidden w-100 ps-4 pe-4 pb-4 pt-1 ">
+                 Hover="true" Bordered="true" Dense="true" Elevation="0" Class="w-100" Style="background-color: var(--mud-palette-primary-hover)">
         
         <ToolBarContent>
             <MudTooltip Text="Add Category" Delay="650">

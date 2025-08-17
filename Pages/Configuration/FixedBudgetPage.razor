@@ -1,7 +1,9 @@
 ﻿@inject FixedBudgetRepository FixedBudgetRepository
 @inject ISnackbar Snackbar
 
-@page "/configuration/fixed-budget"
+@page "/fixed-budget"
+
+<MudText Typo="Typo.h4" Class="mb-4">Fixed Budget</MudText>
 
 @if (_fixedBudget is null)
 {
@@ -11,7 +13,7 @@
 }
 else
 {
-    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" MinimumTabWidth="40px">
+    <MudTabs Rounded="true" Elevation="0" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid Income="true" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_incomes"
                               OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
