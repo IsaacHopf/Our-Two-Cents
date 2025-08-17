@@ -8,20 +8,15 @@
 <MudLayout>
     <MudStack Row="true" Class="h-100" StretchItems="StretchItems.End" Spacing="0">
         
-        <MudPaper Square="true" Elevation="0"
-                  Style="height: 100%; width: 66px; background-color: var(--mud-palette-background-gray); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="width: 66px; height: 68.5px; display: flex; align-items: center; justify-content: center;">
-                <MudIcon Icon="@Icons.Material.TwoTone.SupervisorAccount" Size="Size.Large" Color="Color.Secondary"/>
-            </div>
+        <MudPaper Square="true" Elevation="0" Class="sidebar">
+            <MudIcon Icon="@Icons.Material.TwoTone.SupervisorAccount" Size="Size.Large" Color="Color.Secondary" Class="logo"/>
             <MudNavMenu Bordered="true">
                 <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
                 <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
                 <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed"/>
                 <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
             </MudNavMenu>
-            <div class="mt-auto" style="width: 66px; height: 66px; display: flex; align-items: center; justify-content: center;">
-                <MudToggleIconButton @bind-Toggled="_darkMode" Icon="@Icons.Material.Rounded.DarkMode" ToggledIcon="@Icons.Material.Rounded.LightMode" Class="opacity-75"/>
-            </div>
+            <MudToggleIconButton @bind-Toggled="_darkMode" Icon="@Icons.Material.Rounded.DarkMode" ToggledIcon="@Icons.Material.Rounded.LightMode" Class="opacity-75 mt-auto mb-2"/>
         </MudPaper>
         
         <div class="pa-4">
@@ -40,18 +35,8 @@
 
 @code 
 {
+    private bool _darkMode;
     private ErrorBoundary? _errorBoundary;
-
-    private bool _darkMode = false;
-    private string _darkModeIcon = Icons.Material.Rounded.DarkMode;
-
-    private void ToggleDarkMode()
-    {
-        _darkMode = !_darkMode;
-        _darkModeIcon = _darkMode
-            ? Icons.Material.Rounded.LightMode
-            : Icons.Material.Rounded.DarkMode;
-    }
 
     private readonly MudTheme _theme = new()
     {
@@ -70,12 +55,15 @@
         {
             Primary = Colors.Blue.Darken3,
             Secondary = Colors.Blue.Darken4,
-            BackgroundGray = Colors.Gray.Lighten2
+            Success = Colors.Green.Default,
+            Error = Colors.Red.Default,
+            DrawerBackground = Colors.Gray.Lighten4
         },
         PaletteDark = new PaletteDark
         {
             Primary = Colors.Blue.Darken1,
             Secondary = Colors.Blue.Darken2,
+            Surface = "#32333D"
         }
     };
 }

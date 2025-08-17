@@ -1,8 +1,23 @@
-/* region MainLayout */
+/* region Layout */
 
 html, body, #app {
     height: 100%;
 }
+
+.sidebar {
+    background-color: var(--mud-palette-drawer-background);
+    color: var(--mud-palette-drawer-text);
+    width: 66px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+    .sidebar .logo {
+        height: 68.5px;
+    }
 
 .mud-nav-item a {
     padding: unset;
@@ -19,94 +34,36 @@ html, body, #app {
     justify-content: center;
 }
 
-/* 1) Make the outer table root a column flexbox */
-.datagrid-flex .mud-table-container {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-}
-
-/* 2) Let the inner container shrink and scroll */
-.datagrid-flex  .mud-table-root {
-    flex: 1 1 0 !important;
-    min-height: 0 !important;      /* critical for overflow to work */
-    overflow-y: auto !important;
-}
-
-/*.mud-drawer-header {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-top: 16px;
-    gap: 4px;
-}
-
-.mud-drawer-header .mud-icon-root {
-    width: 42px;
-    height: 42px;
-}
-
-.mud-drawer hr {
-    margin: 0 8px;
-}*/
-
 /* endregion */
 
-/* region NavMenu */
-
-/*.mud-nav-link:hover {
-    color: var(--mud-palette-primary-text);
-}
-
-.mud-nav-link-expand-icon {
-    fill: var(--mud-palette-primary-text) !important;
-}*/
-
-/* endregion */
-
-/* region General */
-
-/*
-a:hover {
-    color: inherit;
-}
-*/
+/* region Misc */
 
 th {
     font-weight: 550 !important;
 }
 
-.mud-table-overflow-y-hidden .mud-table-container {
+.mud-dialog-content {
     overflow-y: hidden;
 }
 
-.mud-dialog-content {
-    overflow-y: hidden !important;
-}
+.mud-tabs-scrollable-content {}
 
-/*Enables scrollable content in tabs.*/
-.mud-tabs-scrollable-content  .mud-tabs-panels {
-    overflow-y: hidden !important;
-}
-
-.mud-tabs-scrollable-content .mud-table {
-    height: 100% !important;
-    display: flex;
-    flex-direction: column;
-}
-
-.mud-tabs-scrollable-content .mud-table-container {
-    flex-grow: 1;
-}
-
-
-
-    /*.mud-tabs-panels {
-        background-color: var(--mud-palette-surface);
-    }*/
-
-.mud-input-underline-none .mud-input-underline:before, .mud-input-underline-none .mud-input-underline:after {
-    content: unset !important;
-}
+    .mud-tabs-scrollable-content  .mud-tabs-panels {
+        overflow-y: hidden;
+    }
+    
+    .mud-tabs-scrollable-content .mud-table {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mud-tabs-scrollable-content .mud-table-container {
+        flex-grow: 1;
+    }
+    
+    .mud-tabs-scrollable-content .mud-toolbar {
+        flex-shrink: 0;
+    }
 
 /* endregion */

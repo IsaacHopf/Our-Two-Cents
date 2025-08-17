@@ -36,7 +36,7 @@ else
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
-            <MudPaper Class="w-100 pa-6">
+            <MudPaper Class="w-100" Elevation="0">
                 <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync"
                               Variant="Variant.Outlined" Lines="10" AutoGrow="true"/>
             </MudPaper>

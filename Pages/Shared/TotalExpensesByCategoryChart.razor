@@ -1,6 +1,8 @@
 ﻿@using ApexCharts
 
-<MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+<div>
+    
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="@(IsTableBelowChart ? Justify.Center : Justify.FlexStart)" Spacing="1" Class="mb-3">
     <MudToggleIconButton Toggled="@_showIncome" ToggledChanged="@OnShowIncomeChangedAsync" Size="@MudBlazor.Size.Small"
                          Icon="@Icons.Material.Rounded.MoneyOff" Color="@MudBlazor.Color.Error"
                          ToggledIcon="@Icons.Material.Rounded.AttachMoney" ToggledColor="@MudBlazor.Color.Success"/>
@@ -14,7 +16,7 @@
     }
 </MudStack>
 
-<MudStack Row="@(!IsTableBelowChart)">
+<MudStack Row="@(!IsTableBelowChart)" AlignItems="@(IsTableBelowChart ? AlignItems.Center : AlignItems.Start)">
     
     @* Reserve horizontal screen space for chart before it loads. *@
     @if (!_chartMounted)
@@ -59,6 +61,8 @@
     </MudTable>
 
 </MudStack>
+
+</div>
 
 @code {
     [Parameter] public required Budget Budget { get; set; }
