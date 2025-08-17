@@ -89,7 +89,8 @@
                                              context.Item.Category = x;
                                              _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
                                          }"
-                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" SelectOnActivation="true" SelectValueOnTab="true" Required="true">
+                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" 
+                                         SelectOnActivation="true" SelectValueOnTab="true" Required="true">
                             <ItemTemplate Context="e">
                                 <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
                             </ItemTemplate>
@@ -181,9 +182,10 @@
 
     private Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken cancellationToken)
     {
-        return Task.FromResult(string.IsNullOrEmpty(searchValue) 
-            ? _categories 
-            : _categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
+        return Task.FromResult(string.IsNullOrEmpty(searchValue)
+            ? (IEnumerable<Category>)_categories
+            : (IEnumerable<Category>)_categories.OrderByDescending(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
+        //: _categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     /// <summary>
