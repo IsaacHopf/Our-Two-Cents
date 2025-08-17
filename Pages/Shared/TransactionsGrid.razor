@@ -4,9 +4,11 @@
 @inject IScrollManager ScrollManager
 @inject ISnackbar Snackbar
 
+<MudStack Row="true" Spacing="0" Class="h-100" Style="overflow-x: hidden;">
+    
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="1" 
-             Class="mud-data-grid-edit-onclick mud-table-overflow-y-hidden ps-6 pe-6 pb-6 pt-1 w-100"
+             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0"
+             Class="mud-data-grid-edit-onclick w-100"
              Style="@(Income ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
     
     <ToolBarContent>
@@ -133,10 +135,11 @@
 
 @if (_showChart)
 {
-    <MudPaper Class="pa-6">
+    <MudPaper Class="pa-6" Elevation="0">
         <TotalExpensesByCategoryChart Budget="@Budget" IsTableBelowChart="true"/>
     </MudPaper>
 }
+</MudStack>
 
 @code {
     /// <summary>Indicates whether the transactions are income or expenses.</summary>

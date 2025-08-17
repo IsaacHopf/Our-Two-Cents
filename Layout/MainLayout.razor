@@ -1,6 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager NavigationManager
-@using System.Globalization
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="@_darkMode"/>
 <MudPopoverProvider/>
@@ -8,25 +6,20 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    
-    <MudDrawer @bind-Open="@_drawerOpen" Color="Color.Secondary">
-        <MudDrawerHeader>
-            <MudIcon Icon="@Icons.Material.Filled.SupervisedUserCircle"/>
-            <MudText Typo="Typo.h6">Our Two Cents</MudText>
-        </MudDrawerHeader>
-        <hr/>
-        <NavMenu/>
-    </MudDrawer>
-    
-    <MudAppBar Dense="true" Color="Color.Primary">
-        <MudIconButton OnClick="@ToggleDrawerOpen" Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit" Edge="Edge.Start"/>
-        <MudText Typo="Typo.h6" Class="ms-3">@BuildBreadcrumbTrail()</MudText>
-        <MudSpacer/>
-        <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Color="Color.Inherit" Edge="Edge.End" Size="Size.Small" Class="opacity-50"/>
-    </MudAppBar>
-    
-    <MudMainContent>
-        <div class="pa-6">
+    <MudStack Row="true" Class="h-100" StretchItems="StretchItems.End" Spacing="0">
+        
+        <MudPaper Square="true" Elevation="0" Class="sidebar">
+            <MudIcon Icon="@Icons.Material.TwoTone.SupervisorAccount" Size="Size.Large" Color="Color.Secondary" Class="logo"/>
+            <MudNavMenu Bordered="true">
+                <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
+                <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
+                <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed"/>
+                <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
+            </MudNavMenu>
+            <MudToggleIconButton @bind-Toggled="_darkMode" Icon="@Icons.Material.Rounded.DarkMode" ToggledIcon="@Icons.Material.Rounded.LightMode" Class="opacity-75 mt-auto mb-2"/>
+        </MudPaper>
+        
+        <div class="pa-4">
             <ErrorBoundary @ref="@_errorBoundary">
                 <ChildContent>
                     @Body
@@ -36,60 +29,41 @@
                 </ErrorContent>
             </ErrorBoundary>
         </div>
-    </MudMainContent>
-    
+        
+    </MudStack>
 </MudLayout>
 
 @code 
 {
+    private bool _darkMode;
     private ErrorBoundary? _errorBoundary;
-
-    private bool _drawerOpen = true;
-
-    private void ToggleDrawerOpen()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-    private bool _darkMode = false;
-    private string _darkModeIcon = Icons.Material.Rounded.DarkMode;
-
-    private void ToggleDarkMode()
-    {
-        _darkMode = !_darkMode;
-        _darkModeIcon = _darkMode
-            ? Icons.Material.Rounded.LightMode
-            : Icons.Material.Rounded.DarkMode;
-    }
-
-    private string BuildBreadcrumbTrail()
-    {
-        var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        uri = Uri.UnescapeDataString(uri);
-        uri = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(uri);
-        uri = uri.Replace("/", "  /  ").Replace("-", " ");
-        return uri;
-    }
 
     private readonly MudTheme _theme = new()
     {
+        Typography = new Typography()
+        {
+            H4 = new H4Typography()
+            {
+                FontSize = "1.85rem"
+            },
+            Caption = new CaptionTypography()
+            {
+                FontSize = ".7rem"
+            }
+        },
         PaletteLight = new PaletteLight
         {
             Primary = Colors.Blue.Darken3,
             Secondary = Colors.Blue.Darken4,
-            Tertiary = Colors.Shades.White,
-            Surface = Colors.Gray.Lighten5,
             Success = Colors.Green.Default,
-            Error = Colors.Red.Darken1
+            Error = Colors.Red.Default,
+            DrawerBackground = Colors.Gray.Lighten4
         },
         PaletteDark = new PaletteDark
         {
             Primary = Colors.Blue.Darken1,
-            Secondary = Colors.Blue.Darken3,
-            Tertiary = Colors.Shades.White,
-            Background = Colors.BlueGray.Default,
-            Surface = Colors.BlueGray.Darken1,
-            TextPrimary = Colors.Gray.Lighten4
+            Secondary = Colors.Blue.Darken2,
+            Surface = "#32333D"
         }
     };
 }

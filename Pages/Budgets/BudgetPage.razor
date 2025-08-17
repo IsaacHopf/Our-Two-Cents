@@ -5,11 +5,15 @@
 
 @page "/budgets/{budgetName}"
 
-<MudStack Row="true" Spacing="6">
-    <ReadOnlyCurrencyTextField Value="@_budget?.TotalIncome" Label="Total Income" />
-    <ReadOnlyCurrencyTextField Value="@(_budget?.TotalExpenses * -1)" Label="Total Expenses"/>
-    <ReadOnlyCurrencyTextField Value="@_budget?.Net" Label="Net"/>
-    <div style="width: 100%;"></div>
+<MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
+    
+<MudStack Row="true">
+    <MudText Typo="Typo.h4">@BudgetName</MudText>
+    <MudStack Row="true" Class="ms-auto">
+        <ReadOnlyCurrencyTextField Label="Total Income" Value="@_budget?.TotalIncome"/>
+        <ReadOnlyCurrencyTextField Label="Total Expenses" Value="@(-_budget?.TotalExpenses)"/>
+        <ReadOnlyCurrencyTextField Label="Net" Value="@_budget?.Net"/>
+    </MudStack>
 </MudStack>
 
 @if (_budget is null)
@@ -20,7 +24,7 @@
 }
 else
 {
-    <MudTabs Rounded="true" Position="Position.Left" Elevation="1" ApplyEffectsToContainer="true" Class="mt-6" MinimumTabWidth="136px">
+    <MudTabs Rounded="true" Elevation="0" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
@@ -32,13 +36,14 @@ else
                               OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
-            <MudPaper Class="w-100 pa-6">
+            <MudPaper Class="w-100" Elevation="0">
                 <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync"
                               Variant="Variant.Outlined" Lines="10" AutoGrow="true"/>
             </MudPaper>
         </MudTabPanel>
     </MudTabs>
 }
+</MudStack>
 
 @code {
     [Parameter] public required string BudgetName { get; set; }
