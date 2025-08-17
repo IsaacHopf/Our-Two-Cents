@@ -66,4 +66,8 @@ th {
         flex-shrink: 0;
     }
 
+.mud-fab {
+    box-shadow: var(--mud-elevation-2) !important;
+}
+
 /* endregion */
