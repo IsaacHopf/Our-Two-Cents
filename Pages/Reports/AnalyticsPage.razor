@@ -26,9 +26,9 @@ else
         @if (_selectedBudgets.Any())
         {
             <MudStack Row="true" Class="ms-auto">
-                <ReadOnlyCurrencyTextField Label="Average Income" Value="@_selectedBudgets.Average(x => x.TotalIncome)"/>
-                <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(-_selectedBudgets.Average(x => x.TotalExpenses))"/>
-                <ReadOnlyCurrencyTextField Label="Average Net" Value="@_selectedBudgets.Average(x => x.Net)"/>
+                <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
+                <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
+                <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
             </MudStack>
         }
     </MudStack>

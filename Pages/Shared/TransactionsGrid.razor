@@ -35,23 +35,26 @@
                     <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"/>
                 </MudTooltip>
             }
-            <div class="ms-auto">
-                <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
-                    <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
-                        <MudStack Row="true" Spacing="0">
-                            <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
-                            @if (_showChart)
-                            {
-                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
-                            }
-                            else
-                            {
-                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
-                            }
-                        </MudStack>
-                    </MudButton>
-                </MudTooltip>
-            </div>
+            @if (!HideChart)
+            {
+                <div class="ms-auto">
+                    <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
+                        <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
+                            <MudStack Row="true" Spacing="0">
+                                <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
+                                @if (_showChart)
+                                {
+                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
+                                }
+                                else
+                                {
+                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
+                                }
+                            </MudStack>
+                        </MudButton>
+                    </MudTooltip>
+                </div> 
+            }
         }
     </ToolBarContent>
     
@@ -151,6 +154,7 @@
     [Parameter] public IEnumerable<Transaction>? FixedTransactions { get; set; }
     [Parameter] public EventCallback<Transaction> OnTransactionChanged { get; set; }
     [Parameter] public EventCallback OnDisableEdit { get; set; }
+    [Parameter] public bool HideChart { get; set; }
 
     private List<Category> _categories = [];
     private MudDataGrid<Transaction>? _gridRef;

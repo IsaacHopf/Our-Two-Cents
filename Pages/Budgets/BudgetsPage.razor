@@ -53,59 +53,6 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        // Update all current budgets to include Category based on the Type.
-        
-        // var budgets = await BudgetsRepository.Query().ToListAsync();
-        // foreach (var budget in budgets)
-        // {
-        //     foreach (var expense in budget.Expenses)
-        //     {
-        //         var type = expense.Type;
-        //
-        //         Category? category = type switch
-        //         {
-        //             "Living" => new Category("Living", "#cc6666", Guid.Parse("70167ea0-be92-4e7c-b5c0-afd3fc5c5a08")),
-        //             "Groceries" => new Category("Groceries", "#ff9966", Guid.Parse("400a8592-75d3-4ab8-8e9f-c2fcb6406efa")),
-        //             "Amazon" => new Category("Amazon", "#f5cb7d", Guid.Parse("59ac4128-749d-4aa0-a386-fc370cb32183")),
-        //             "Recreation" => new Category("Recreation", "#87a96b", Guid.Parse("4f00cfbb-4f9a-451f-84d5-7c0c8b40c7d4")),
-        //             "Cat Supplies" => new Category("Cat Supplies", "#a1caf1", Guid.Parse("4751cb06-4922-409f-9006-f94f78533c2d")),
-        //             "Investments" => new Category("Investments", "#a2a2d0", Guid.Parse("c20df993-6076-4e99-89e6-2d8eb66f8ff6")),
-        //             "Medical" => new Category("Medical", "#cba0de", Guid.Parse("a732cc9f-e5ff-473a-8c7f-780448980a88")),
-        //             "Misc." => new Category("Misc.", "#f4c2c2", Guid.Parse("f0d78a99-ef10-4957-90fe-1a4c8790ef6e")),
-        //             _ => null
-        //         };
-        //
-        //         expense.Category = category;
-        //     }
-        // }
-        //
-        // foreach (var budget in budgets)
-        //     await BudgetsRepository.UpsertAsync(budget);
-        //
-        // var fixedBudget = await FixedBudgetRepository.GetAsync();
-        //
-        // foreach (var expense in fixedBudget.Expenses)
-        // {
-        //     var type = expense.Type;
-        //
-        //     Category? category = type switch
-        //     {
-        //         "Living" => new Category("Living", "#cc6666", Guid.Parse("70167ea0-be92-4e7c-b5c0-afd3fc5c5a08")),
-        //         "Groceries" => new Category("Groceries", "#ff9966", Guid.Parse("400a8592-75d3-4ab8-8e9f-c2fcb6406efa")),
-        //         "Amazon" => new Category("Amazon", "#f5cb7d", Guid.Parse("59ac4128-749d-4aa0-a386-fc370cb32183")),
-        //         "Recreation" => new Category("Recreation", "#87a96b", Guid.Parse("4f00cfbb-4f9a-451f-84d5-7c0c8b40c7d4")),
-        //         "Cat Expenses" => new Category("Cat Expenses", "#a1caf1", Guid.Parse("4751cb06-4922-409f-9006-f94f78533c2d")),
-        //         "Investments" => new Category("Investments", "#a2a2d0", Guid.Parse("c20df993-6076-4e99-89e6-2d8eb66f8ff6")),
-        //         "Medical" => new Category("Medical", "#cba0de", Guid.Parse("a732cc9f-e5ff-473a-8c7f-780448980a88")),
-        //         "Misc." => new Category("Misc.", "#f4c2c2", Guid.Parse("f0d78a99-ef10-4957-90fe-1a4c8790ef6e")),
-        //         _ => null
-        //     };
-        //
-        //     expense.Category = category;
-        // }
-        //
-        // await FixedBudgetRepository.UpsertAsync(fixedBudget);
-        
         await SetBudgetNameItemsAsync();
     }
 

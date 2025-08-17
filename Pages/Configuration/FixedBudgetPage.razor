@@ -20,7 +20,7 @@ else
         </MudTabPanel>
         <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
             <TransactionsGrid Income="false" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_expenses"
-                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
+                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync" HideChart="true"/>
         </MudTabPanel>
     </MudTabs>
 }
