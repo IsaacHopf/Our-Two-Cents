@@ -5,48 +5,44 @@
 
 @page "/budgets"
 
-<MudPaper Square="true" Elevation="1" Style="height: 56px; width: 100%; background-color: #CFD8DC; display: flex; align-items: center; padding: 24px;">
-    <MudText Typo="Typo.h5">Budgets</MudText>
-</MudPaper>
+<MudText Typo="Typo.h4" Class="mb-4">Budgets</MudText>
 
-<div class="pa-6">
-    <MudStack Row Spacing="6" AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.Middle" Class="mb-6">
-    
-        <MudTooltip Text="Create Budget" Delay="650">
-            <MudIconButton OnClick="@OpenCreateDialog" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large" Variant="Variant.Filled" Class="rounded-circle"/>
+<MudStack Row Spacing="4" AlignItems="AlignItems.Center" Justify="Justify.Center" StretchItems="StretchItems.Middle" Class="mb-4">
+
+    <MudTooltip Text="Create Budget" Delay="650">
+        <MudIconButton OnClick="@OpenCreateDialog" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large" Variant="Variant.Filled" Class="rounded-circle"/>
+    </MudTooltip>
+    <MudNumericField T="int?" Value="@_year" ValueChanged="@YearValueChangedHandler" Immediate="true" DebounceInterval="250"
+                     Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" Clearable="true" Margin="Margin.Dense"/>
+    @if (_showDelete)
+    {
+        <MudTooltip Text="Delete Budgets" Delay="650">
+            <MudIconButton OnClick="@OpenDeleteDialog" Icon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Large" Variant="Variant.Filled" Class="rounded-circle"/>
         </MudTooltip>
-        <MudNumericField T="int?" Value="@_year" ValueChanged="@YearValueChangedHandler" Immediate="true" DebounceInterval="250"
-                         Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" Clearable="true"/>
-        @if (_showDelete)
-        {
-            <MudTooltip Text="Delete Budgets" Delay="650">
-                <MudFab OnClick="@OpenDeleteDialog" StartIcon="@Icons.Material.Rounded.Delete" Color="Color.Error" Size="Size.Large"/>
-            </MudTooltip>
-        }
-    </MudStack>
+    }
+</MudStack>
 
-    @if (_isLoading)
-    {
-        <MudStack AlignItems="AlignItems.Center">
-            <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
-        </MudStack>
-    }
-    else
-    {
-        <MudList T="string">
+@if (_isLoading)
+{
+    <MudStack AlignItems="AlignItems.Center">
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" Class="mt-6" />
+    </MudStack>
+}
+else
+{
+    <MudList T="string">
+        <MudDivider />
+        @foreach (var item in _budgetNameItems)
+        {
+            <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
+                <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
+                <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
+                             Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
+            </MudStack>
             <MudDivider />
-            @foreach (var item in _budgetNameItems)
-            {
-                <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
-                    <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
-                    <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
-                                 Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
-                </MudStack>
-                <MudDivider />
-            }
-        </MudList>
-    }
-</div>
+        }
+    </MudList>
+}
 
 
 @code {

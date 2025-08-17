@@ -1,7 +1,5 @@
-﻿<MudPaper Class="pa-1" Elevation="1" >
-    <MudTextField Value="@Value" Label="@Label" ReadOnly="true" Variant="Variant.Text" Class="mud-input-underline-none"
-                  Adornment="Adornment.Start" AdornmentIcon="@_icon" AdornmentColor="@_iconColor" Typo="Typo.subtitle1"/>
-</MudPaper>
+﻿<MudTextField Value="@Value" Label="@Label" ReadOnly="true" Variant="Variant.Filled" Margin="Margin.Dense"
+              Adornment="Adornment.Start" AdornmentIcon="@_icon" AdornmentColor="@_iconColor"/>
 
 @code {
     [Parameter] public decimal? Value { get; set; }

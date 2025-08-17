@@ -13,6 +13,24 @@ html, body, #app {
 .mud-nav-item .mud-nav-link-text{
     margin: unset;
     width: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 1) Make the outer table root a column flexbox */
+.datagrid-flex .mud-table-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+/* 2) Let the inner container shrink and scroll */
+.datagrid-flex  .mud-table-root {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;      /* critical for overflow to work */
+    overflow-y: auto !important;
 }
 
 /*.mud-drawer-header {
@@ -31,8 +49,6 @@ html, body, #app {
 .mud-drawer hr {
     margin: 0 8px;
 }*/
-
-.
 
 /* endregion */
 
@@ -68,9 +84,26 @@ th {
     overflow-y: hidden !important;
 }
 
-.mud-tabs-panels {
-    background-color: var(--mud-palette-surface);
+/*Enables scrollable content in tabs.*/
+.mud-tabs-scrollable-content  .mud-tabs-panels {
+    overflow-y: hidden !important;
 }
+
+.mud-tabs-scrollable-content .mud-table {
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.mud-tabs-scrollable-content .mud-table-container {
+    flex-grow: 1;
+}
+
+
+
+    /*.mud-tabs-panels {
+        background-color: var(--mud-palette-surface);
+    }*/
 
 .mud-input-underline-none .mud-input-underline:before, .mud-input-underline-none .mud-input-underline:after {
     content: unset !important;

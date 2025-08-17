@@ -8,19 +8,23 @@
 <MudLayout>
     <MudStack Row="true" Class="h-100" StretchItems="StretchItems.End" Spacing="0">
         
-        <MudPaper Elevation="1" Style="height: 100%; width: 56px; background-color: #CFD8DC" Square="true">
-            <div style="width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
-                <MudIcon Icon="@Icons.Material.Rounded.SupervisedUserCircle" Size="Size.Large" Color="Color.Primary"/>
+        <MudPaper Square="true" Elevation="0"
+                  Style="height: 100%; width: 66px; background-color: var(--mud-palette-background-gray); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="width: 66px; height: 68.5px; display: flex; align-items: center; justify-content: center;">
+                <MudIcon Icon="@Icons.Material.TwoTone.SupervisorAccount" Size="Size.Large" Color="Color.Secondary"/>
             </div>
-            <MudNavMenu>
+            <MudNavMenu Bordered="true">
                 <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
                 <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
-                <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed Budget"/>
+                <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed"/>
                 <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
             </MudNavMenu>
+            <div class="mt-auto" style="width: 66px; height: 66px; display: flex; align-items: center; justify-content: center;">
+                <MudToggleIconButton @bind-Toggled="_darkMode" Icon="@Icons.Material.Rounded.DarkMode" ToggledIcon="@Icons.Material.Rounded.LightMode" Class="opacity-75"/>
+            </div>
         </MudPaper>
         
-        <div>
+        <div class="pa-4">
             <ErrorBoundary @ref="@_errorBoundary">
                 <ChildContent>
                     @Body
@@ -32,59 +36,6 @@
         </div>
         
     </MudStack>
-    
-    
-    
-    
-    
-    @*<MudDrawerContainer style="height: 100%;">
-        <MudDrawer Open="@false" Fixed="@false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="@true" Breakpoint="Breakpoint.None">
-            <NavMenu/>
-            $1$<MudPaper Square="true" Elevation="1">
-            <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
-            <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
-            <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed Budget"/>
-            <NavMenuItem Href="/reports" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Reports"/>
-            <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Edge="Edge.End"
-                           Color="Color.Inherit" Size="Size.Small" Class="opacity-50 mt-auto"/>
-        </MudPaper>#1#
-        </MudDrawer>
-
-        <div class="pa-6">
-            <ErrorBoundary @ref="@_errorBoundary">
-                <ChildContent>
-                    @Body
-                </ChildContent>
-                <ErrorContent>
-                    <Error Exception="@context" ErrorBoundary="@_errorBoundary"/>
-                </ErrorContent>
-            </ErrorBoundary>
-        </div>
-    </MudDrawerContainer>*@
-
-    
-    
-    
-    
-    @*<MudDrawer Open="true">
-        <NavMenu/>
-        <MudIconButton OnClick="@ToggleDarkMode" Icon="@_darkModeIcon" Edge="Edge.End"
-                       Color="Color.Inherit" Size="Size.Small" Class="opacity-50 mt-auto"/>
-    </MudDrawer>
-    
-    <MudMainContent>
-        <div class="pa-6">
-            <ErrorBoundary @ref="@_errorBoundary">
-                <ChildContent>
-                    @Body
-                </ChildContent>
-                <ErrorContent>
-                    <Error Exception="@context" ErrorBoundary="@_errorBoundary"/>
-                </ErrorContent>
-            </ErrorBoundary>
-        </div>
-    </MudMainContent>*@
-
 </MudLayout>
 
 @code 
@@ -104,13 +55,27 @@
 
     private readonly MudTheme _theme = new()
     {
+        Typography = new Typography()
+        {
+            H4 = new H4Typography()
+            {
+                FontSize = "1.85rem"
+            },
+            Caption = new CaptionTypography()
+            {
+                FontSize = ".7rem"
+            }
+        },
         PaletteLight = new PaletteLight
         {
-            Primary = Colors.Blue.Darken4
+            Primary = Colors.Blue.Darken3,
+            Secondary = Colors.Blue.Darken4,
+            BackgroundGray = Colors.Gray.Lighten2
         },
         PaletteDark = new PaletteDark
         {
-            Primary = Colors.Blue.Darken1
+            Primary = Colors.Blue.Darken1,
+            Secondary = Colors.Blue.Darken2,
         }
     };
 }
