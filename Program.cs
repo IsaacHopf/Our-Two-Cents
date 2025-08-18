@@ -66,7 +66,7 @@ public class Program
         });
 
         // Setup Configuration.
-        var config = new ConfigurationBuilder().AddUserSecrets<Program>().AddJsonFile("appsettings.json").Build();
+        var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         
         // Setup Database.
         var cosmosClient = new CosmosClient(config["CosmosConnectionString"],
