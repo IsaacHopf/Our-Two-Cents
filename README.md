@@ -32,16 +32,16 @@
        ]
    ]
    ```
-4. Add the Azure Cosmos DB connection string to .NET User Secrets:
-   ```json
-   {
-       "CosmosConnectionString": "<azure-cosmos-db-connection-string>"
-   }
-   ```
-5. Add the database and container names to [appsettings.json](appsettings.json):
+4. Add the database and container names to [appsettings.json](appsettings.json):
    ```json
    {
        "DatabaseName": "BudgetApp",
        "BudgetsContainerName": "Budgets"
+   }
+   ```
+4. Add the Azure Cosmos DB connection string to [appsettings.json](appsettings.json):
+   ```json
+   {
+      "CosmosConnectionString": "<azure-cosmos-db-connection-string>"
    }
    ```
