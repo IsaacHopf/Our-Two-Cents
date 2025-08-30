@@ -242,7 +242,7 @@
     private async Task ScrollToBottomAsync()
     {
         await Task.Delay(100);
-        await ScrollManager.ScrollToBottomAsync("main", ScrollBehavior.Smooth);
+        await ScrollManager.ScrollIntoViewAsync("table tbody tr:last-child", ScrollBehavior.Smooth);
     }
 
     /// <summary>
