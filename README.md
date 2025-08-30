@@ -8,8 +8,16 @@
 - Manage fixed income or expenses and add them to budgets.
 - Visualize data with interactive charts.
 - Generate useful financial reports.
+- Pick between light or dark mode. 
 
-## 🧱 Tech Stack
+## 📸 Screenshots
+![Budgets](assets/budgets.png)
+![Budgets - Dark](assets/budgets-dark.PNG)
+![Budget - Income](assets/budget-income.PNG)
+![Budget - Expenses](assets/budget-expenses.PNG)
+![Analytics](assets/analytics.PNG)
+
+## 🧰 Tech Stack
 - Frontend: Blazor, MudBlazor
 - Backend: C#, .NET
 - Cross-Platform: Photino
