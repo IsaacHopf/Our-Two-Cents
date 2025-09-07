@@ -1,12 +1,17 @@
-﻿namespace BudgetApp.Services.Entities;
+﻿using System.Text.Json.Serialization;
 
-public class Transaction(decimal amount, string source, Category category, DateTime? date = null, string? type = null)
+namespace BudgetApp.Services.Entities;
+
+public class Transaction(decimal amount, string source, Category category, DateTime? date = null)
 {
     public decimal Amount { get; set; } = amount;
     public string Source { get; set; } = source;
-    public string? Type { get; set; } = type;
     public Category Category { get; set; } = category;
     public DateTime? Date { get; set; } = date;
+    
+    /// <remarks>Used for simpler sorting / filtering in MudBlazor's DataGrid.</remarks>
+    [JsonIgnore]
+    public string CategoryName => Category.Name;
 }
 
 public class TransactionComparer : IEqualityComparer<Transaction>
