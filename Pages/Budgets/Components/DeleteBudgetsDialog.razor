@@ -8,7 +8,13 @@
     </TitleContent>
 
     <DialogContent>
-        Are you sure you want to delete the following budget(s): @(string.Join(", ", BudgetNamesToDelete))?
+        Are you sure you want to delete the following budget(s)?
+        <ul>
+            @foreach (var budget in BudgetNamesToDelete)
+            {
+                <li>@budget</li>
+            }
+        </ul>
     </DialogContent>
 
     <DialogActions>
