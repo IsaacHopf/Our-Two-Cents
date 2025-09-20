@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Linq;
 
-namespace BudgetApp.Services.Repositories;
+namespace BudgetApp.Services;
 
 public static class CosmosExtensions
 {

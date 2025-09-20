@@ -67,6 +67,7 @@ public class Program
 
         // Setup Configuration.
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        builder.Services.AddSingleton<IConfiguration>(config);
         
         // Setup Database.
         var cosmosClient = new CosmosClient(config["CosmosConnectionString"],
@@ -77,10 +78,11 @@ public class Program
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }
             });
+        builder.Services.AddSingleton(cosmosClient);
         
-        builder.Services.AddSingleton(new BudgetsRepository(cosmosClient, config));
-        builder.Services.AddSingleton(new FixedBudgetRepository(cosmosClient, config));
-        builder.Services.AddSingleton(new CategoriesRepository(cosmosClient, config));
+        builder.Services.AddSingleton<BudgetsRepository>();
+        builder.Services.AddSingleton<FixedBudgetRepository>();
+        builder.Services.AddSingleton<CategoriesRepository>();
 
         // Set Culture to show (-) for negative numbers.
         if (Thread.CurrentThread.CurrentCulture.Name.Equals("en-US", StringComparison.Ordinal)
