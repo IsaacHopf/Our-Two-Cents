@@ -1,6 +1,13 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+
 <MudNavMenu Bordered="true">
     <NavMenuItem Href="/budgets" Icon="@Icons.Material.Rounded.AttachMoney" Text="Budgets"/>
     <NavMenuItem Href="/categories" Icon="@Icons.Material.Rounded.Category" Text="Categories"/>
     <NavMenuItem Href="/fixed-budget" Icon="@Icons.Material.Rounded.PushPin" Text="Fixed"/>
+    @if (Config.GetValue<bool?>("EnableReminders") is true)
+    {
+        <NavMenuItem Href="/reminders" Icon="@Icons.Material.Rounded.Notifications" Text="Reminders"/>
+    }
     <NavMenuItem Href="/analytics" Icon="@Icons.Material.Rounded.CollectionsBookmark" Text="Analytics"/>
 </MudNavMenu>
