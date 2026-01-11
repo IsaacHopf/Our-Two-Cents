@@ -84,7 +84,7 @@
                     <MudStack Row="true" AlignItems="AlignItems.Center">
                         <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
                         @* Modal must be false or else edit mode will be disabled when clicking on MudAutocomplete. *@
-                        <MudAutocomplete T="Category" Value="@context.Item.Category" Modal="false"
+                        <MudAutocomplete T="Category" Value="@context.Item.Category" Modal="false" MaxItems="null"
                                          ValueChanged="x => 
                                          { 
                                              context.Item.Category = x;
@@ -178,7 +178,7 @@
             "executeCallbackOnEditMudDataGridEnter", 
             nameof(AddTransactionAsync));
         
-        _categories = await CategoriesRepository.ReadAsync();
+        _categories = (await CategoriesRepository.ReadAsync()).OrderBy(x => x.Name).ToList();
     }
 
     private Task<IEnumerable<Category>> GetCategoriesAsync(string searchValue, CancellationToken cancellationToken)
@@ -186,7 +186,6 @@
         return Task.FromResult(string.IsNullOrEmpty(searchValue)
             ? (IEnumerable<Category>)_categories
             : (IEnumerable<Category>)_categories.OrderByDescending(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
-        //: _categories.Where(x => x.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     /// <summary>
