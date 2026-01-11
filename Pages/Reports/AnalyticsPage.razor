@@ -39,57 +39,55 @@ else
         <MudStack StretchItems="StretchItems.End" Class="h-100 mt-1" Style="overflow-y: hidden" Spacing="0">
             
             <div>
-                <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650">
-                    <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text" Size="Size.Small">
-                        <MudStack Row="true" Spacing="0">
-                            <MudIcon Icon="@Icons.Material.Rounded.AreaChart" Color="Color.Default"/>
-                            @if (_showChart)
-                            {
-                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowUp" Color="Color.Default"/>
-                            }
-                            else
-                            {
-                                <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowDown" Color="Color.Default"/>
-                            }
-                        </MudStack>
-                    </MudButton>
-                </MudTooltip>
+                <MudToggleGroup T="bool" @bind-Value="_showChart" Outlined="false" CheckMark="true" Style="width: fit-content;">
+                    <MudTooltip Text="Show Chart" Delay="650">
+                        <MudToggleItem Value="true" Text="" SelectedIcon="@Icons.Material.Rounded.AreaChart" UnselectedIcon="@Icons.Material.Rounded.AreaChart"/>
+                    </MudTooltip>
+                    <MudTooltip Text="Show Table" Delay="650">
+                        <MudToggleItem Value="false" Text="" SelectedIcon="@Icons.Material.Rounded.TableRows" UnselectedIcon="@Icons.Material.Rounded.TableRows"/>
+                    </MudTooltip>
+                </MudToggleGroup>
             </div>
             
             @if (_showChart)
             {
-                <BudgetTotalsChart Budgets="_selectedBudgets" Height="40%" Width="100%"/>
+                <div class="h-100 w-100 mt-1">
+                    <BudgetTotalsChart Budgets="_selectedBudgets" Width="100%" Height="95%"/>
+                </div>
             }
-
-            <MudDataGrid Items="@_selectedBudgets" Hover="true" Dense="true" Bordered="true" Elevation="0" 
+            else
+            {
+                <MudDataGrid Items="@_selectedBudgets" Hover="true" Dense="true" Bordered="true" Elevation="0" 
                          Class="mt-1 mud-table-overflow-hidden-container" Style="background-color: var(--mud-palette-primary-hover);">
-                <Columns>
-                    <HierarchyColumn EnableHeaderToggle="true"/>
-                    <PropertyColumn Title="Budget" Property="x => x.Name"/>
-                    <PropertyColumn Title="Total Income" Property="x => x.TotalIncome" Format="C"/>
-                    <PropertyColumn Title="Total Expenses" Property="x => -x.TotalExpenses" Format="C"/>
-                    <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
-                </Columns>
-                <ChildRowContent>
-                    <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 350px;">
-                        <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
-                        <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
-                            <Columns>
-                                <PropertyColumn Property="x => x.Source" />
-                                <PropertyColumn Property="x => x.Amount" Format="C" />
-                                <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
-                                    <CellTemplate Context="cellContext">
-                                        <MudStack Row="true" AlignItems="AlignItems.Center">
-                                            <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                                            <span>@cellContext.Item.Category.Name</span>
-                                        </MudStack>
-                                    </CellTemplate>
-                                </PropertyColumn>
-                            </Columns>
-                        </MudDataGrid>
-                    </MudStack>
-                </ChildRowContent>
-            </MudDataGrid>
+                    <Columns>
+                        <HierarchyColumn EnableHeaderToggle="true"/>
+                        <PropertyColumn Title="Budget" Property="x => x.Name"/>
+                        <PropertyColumn Title="Total Income" Property="x => x.TotalIncome" Format="C"/>
+                        <PropertyColumn Title="Total Expenses" Property="x => -x.TotalExpenses" Format="C"/>
+                        <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
+                    </Columns>
+                    <ChildRowContent>
+                        <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 400px;">
+                            <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
+                            <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                <Columns>
+                                    <PropertyColumn Property="x => x.Source" />
+                                    <PropertyColumn Property="x => x.Amount" Format="C" />
+                                    <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
+                                        <CellTemplate Context="cellContext">
+                                            <MudStack Row="true" AlignItems="AlignItems.Center">
+                                                <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                                <span>@cellContext.Item.Category.Name</span>
+                                            </MudStack>
+                                        </CellTemplate>
+                                    </PropertyColumn>
+                                </Columns>
+                            </MudDataGrid>
+                        </MudStack>
+                    </ChildRowContent>
+                </MudDataGrid>
+            }
+            
         </MudStack>
     }
 }
