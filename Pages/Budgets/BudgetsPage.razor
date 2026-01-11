@@ -10,8 +10,8 @@
     <MudTooltip Text="Create Budget" Delay="650">
         <MudIconButton OnClick="@OpenCreateDialog" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large" Variant="Variant.Filled" Class="rounded-circle"/>
     </MudTooltip>
-    <MudNumericField T="int?" Value="@_year" ValueChanged="@YearValueChangedHandler" Immediate="true" DebounceInterval="250"
-                     Min="2000" Max="9999" Format="D4" Label="Year" Variant="Variant.Filled" Clearable="true" Margin="Margin.Dense"/>
+    <MudTextField T="string?" Value="@_search" ValueChanged="@SearchValueChangedHandler" Immediate="true" DebounceInterval="300" 
+                  Label="Search" Variant="Variant.Filled" Clearable="true" Margin="Margin.Dense"/>
     @if (_showDelete)
     {
         <MudTooltip Text="Delete Budgets" Delay="650">
@@ -44,33 +44,33 @@ else
 
 
 @code {
-    private int? _year = DateTime.Today.Year;
+    private string? _search;
     private bool _isLoading = true;
     /// <remarks>Must be a list. Otherwise, the checkboxes don't update.</remarks>
     private List<BudgetNameItem> _budgetNameItems = [];
+    private List<BudgetNameItem> _allBudgetNameItems = [];
     private bool _showDelete = false;
     
     protected override async Task OnInitializedAsync()
     {
-        await SetBudgetNameItemsAsync();
-    }
-
-    private async Task SetBudgetNameItemsAsync()
-    {
-        var query = _year is null
-            ? BudgetsRepository.Query().OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
-            : BudgetsRepository.Query().Where(x => x.Year == (int)_year).OrderByDescending(x => x.Month);
+        var allBudgetNames = await BudgetsRepository.Query()
+            .OrderByDescending(x => x.Year)
+            .ThenByDescending(x => x.Month)
+            .Select(x => x.Name)
+            .ToEnumerableAsync();
         
-        var budgetNames = await query.Select(x => x.Name).ToEnumerableAsync();
-        _budgetNameItems = budgetNames.Select(name => new BudgetNameItem(name)).ToList();
+        _allBudgetNameItems = allBudgetNames.Select(name => new BudgetNameItem(name)).ToList();
+        _budgetNameItems = _allBudgetNameItems;
 
         _isLoading = false;
     }
 
-    private async Task YearValueChangedHandler(int? year)
+    private void SearchValueChangedHandler(string? search)
     {
-        _year = year;
-        await SetBudgetNameItemsAsync();
+        if (string.IsNullOrWhiteSpace(search)) _budgetNameItems = _allBudgetNameItems;
+
+        _search = search;
+        _budgetNameItems = _allBudgetNameItems.Where(x => x.Name.Contains(search!)).ToList();
         _showDelete = false;
     }
 
