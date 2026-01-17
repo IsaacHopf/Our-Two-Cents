@@ -5,22 +5,33 @@ html, body, #app {
 }
 
 .brand {
-    height: 68.5px;
+    height: 68px;
 }
 
-.mud-nav-item a {
+.mud-nav-item {
+    width: 68px;
+    height: 68px;
+    padding: unset;
+}
+
+.mud-nav-item .mud-nav-link {
     padding: unset;
     align-items: center;
     justify-content: center;
+    transition: unset !important;
 }
 
-.mud-nav-item .mud-nav-link-text{
+.mud-nav-item .mud-nav-link-text {
     margin: unset;
     width: unset;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.mud-nav-item .mud-nav-link-text .mud-icon-root {
+    font-size: 1.65rem;
 }
 
 /* endregion */
