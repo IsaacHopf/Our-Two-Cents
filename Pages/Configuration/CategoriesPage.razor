@@ -2,6 +2,7 @@
 @inject CategoriesRepository CategoriesRepository
 @inject FixedBudgetRepository FixedBudgetRepository;
 @inject ISnackbar Snackbar
+@using MudBlazor.Utilities
 
 @page "/categories"
 
@@ -27,7 +28,11 @@ else
         
         <Columns>
             <PropertyColumn Property="x => x.Id" Hidden/>
-            <PropertyColumn Property="x => x.Name" Required/>
+            <PropertyColumn Property="x => x.Name" Required>
+                <EditTemplate>
+                    <MudTextField Label="Name" @bind-Value="context.Item.Name" Variant="Variant.Filled"/>
+                </EditTemplate>
+            </PropertyColumn>
             <PropertyColumn Property="x => x.Color" Required>
                 <CellTemplate>
                     <MudStack Row="true" AlignItems="AlignItems.Center">
@@ -35,6 +40,10 @@ else
                         <span>@context.Item.Color</span>
                     </MudStack>
                 </CellTemplate>
+                <EditTemplate>
+                    <MudText Typo="Typo.body1" Class="mt-2">Color</MudText>
+                    <MudColorPicker Label="Color" @bind-Value="_currentColor" PickerVariant="PickerVariant.Static" ShowAlpha="false"/>
+                </EditTemplate>
             </PropertyColumn>
             <TemplateColumn>
                 <CellTemplate>
@@ -50,6 +59,7 @@ else
     private List<Category>? _categories;
     private MudDataGrid<Category>? _gridRef;
     private bool _addingCategory;
+    private MudColor? _currentColor;
 
     private readonly DialogOptions _dialogOptions = new()
     {
@@ -90,6 +100,8 @@ else
         }
             
         _addingCategory = false;
+
+        category.Color = _currentColor?.Value[..7] ?? "#f4c2c2";
             
         _categories!.Add(category);
         await CategoriesRepository.UpsertAsync(_categories);
@@ -97,6 +109,8 @@ else
 
     private async Task EditCategoryAsync(Category category)
     {
+        category.Color = _currentColor?.Value[..7] ?? "#f4c2c2";
+        
         var budgetsWithCategory = await BudgetsRepository.Query()
             .Where(budget => budget.Expenses.Any(expense => expense.Category.Id == category.Id))
             .ToListAsync();
