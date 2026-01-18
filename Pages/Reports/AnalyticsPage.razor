@@ -26,8 +26,8 @@
 else
 {
     <MudStack Row="true">
-        <MudSelect Label="Budgets" @bind-SelectedValues="@_selectedBudgets" MultiSelection="true" SelectAll="true" Clearable="true"
-                   Dense="true" Margin="Margin.Dense" Variant="Variant.Filled">
+        <MudSelect Label="Budgets" @bind-SelectedValues="@_selectedBudgets" MultiSelection="true" SelectAll="true" 
+                   Clearable="true" Variant="Variant.Filled">
             @foreach (var budget in _budgets)
             {
                 <MudSelectItem Value="@budget">@budget.Name</MudSelectItem>
@@ -58,7 +58,7 @@ else
             }
             else
             {
-                <MudDataGrid Items="@_selectedBudgets" Hover="true" Dense="true" Bordered="true" Elevation="0" 
+                <MudDataGrid Items="@_selectedBudgets" Hover="true" Bordered="true" Elevation="0" 
                          Class="mt-1 mud-table-overflow-hidden-container" Style="background-color: var(--mud-palette-primary-hover);">
                     <Columns>
                         <HierarchyColumn EnableHeaderToggle="true"/>

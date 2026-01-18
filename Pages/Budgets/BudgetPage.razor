@@ -31,12 +31,12 @@ else
 {
     <MudTabs Rounded="true" Elevation="0" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
-            <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
+            <TransactionsGrid IsIncome="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
                               OnTransactionChanged="@UpdateIncomeAsync" OnDisableEdit="@ShowBudgetSavedPopup"/>
         </MudTabPanel>
         <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
-            <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
+            <TransactionsGrid IsIncome="false" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses"
                               OnTransactionChanged="@UpdateExpensesAsync" OnDisableEdit="@ShowBudgetSavedPopup"/>
         </MudTabPanel>
@@ -83,14 +83,14 @@ else
     {
         _budget!.Incomes = _incomes.ToList();
         _hasBudgetChanged = true;
-        await SaveBudgetAsync();
+        await BudgetsRepository.UpsertAsync(_budget!);
     }
 
     private async Task UpdateExpensesAsync()
     {
         _budget!.Expenses = _expenses.ToList();
         _hasBudgetChanged = true;
-        await SaveBudgetAsync();
+        await BudgetsRepository.UpsertAsync(_budget!);
     }
 
     private async Task UpdateNotesAsync(string? notes)
@@ -99,11 +99,6 @@ else
         
         _budget!.Notes = notes;
         _hasBudgetChanged = true;
-        await SaveBudgetAsync();
-    }
-    
-    private async Task SaveBudgetAsync()
-    {
         await BudgetsRepository.UpsertAsync(_budget!);
     }
 

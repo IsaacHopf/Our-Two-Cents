@@ -7,13 +7,13 @@
 <MudStack Row="true" Spacing="0" Class="h-100" Style="overflow-x: hidden;">
     
 <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Dense="true" Elevation="0"
+             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Elevation="0"
              Filterable="true" ShowFilterIcons="false" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive"
              Class="w-100 mud-data-grid-edit-onclick" 
-             Style="@(Income ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
+             Style="@(IsIncome ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
     
     <ToolBarContent>
-        @if (Income)
+        @if (IsIncome)
         {
             <MudTooltip Text="Add Income (Enter)" Delay="650">
                 <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
@@ -71,7 +71,7 @@
                                  }"/>
             </EditTemplate>
         </PropertyColumn>
-        @if (!Income)
+        @if (!IsIncome)
         {
             <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
                 <CellTemplate>
@@ -119,7 +119,7 @@
         </PropertyColumn>
         <TemplateColumn>
             <EditTemplate>
-                @if (Income)
+                @if (IsIncome)
                 {
                     <div tabindex="-1">
                         <MudTooltip Text="Delete Income" Delay="650">
@@ -154,7 +154,7 @@
 
 @code {
     /// <summary>Indicates whether the transactions are income or expenses.</summary>
-    [Parameter] public bool Income { get; set; } = true;
+    [Parameter] public bool IsIncome { get; set; } = true;
     [Parameter] public required int Year { get; set; }
     [Parameter] public required int Month { get; set; }
     [Parameter] public required Budget Budget { get; set; }
@@ -203,7 +203,7 @@
     [JSInvokable]
     public async Task AddTransactionAsync()
     {
-        Transactions.Add(Income 
+        Transactions.Add(IsIncome 
             ? new Transaction(0, string.Empty, _categories.Find(x => x.Name == "Income") ?? new Category("Income")) 
             : new Transaction(0, string.Empty, _categories.Find(x => x.Name == "Misc.") ?? _categories.Last()));
 
@@ -220,7 +220,7 @@
 
         if (!FixedTransactions.Except(Transactions, new TransactionComparer()).Any())
         {
-            Snackbar.Add($"Fixed {(Income ? "Income" : "Expenses")} already added.", Severity.Info);
+            Snackbar.Add($"Fixed {(IsIncome ? "Income" : "Expenses")} already added.", Severity.Info);
             return;
         }
 

@@ -11,7 +11,7 @@
         <MudIconButton OnClick="@OpenCreateDialog" Icon="@Icons.Material.Rounded.Add" Color="Color.Primary" Size="Size.Large" Variant="Variant.Filled" Class="rounded-circle"/>
     </MudTooltip>
     <MudTextField T="string?" Value="@_search" ValueChanged="@SearchValueChangedHandler" Immediate="true" DebounceInterval="300" 
-                  Label="Search" Variant="Variant.Filled" Clearable="true" Margin="Margin.Dense"/>
+                  Label="Search" Variant="Variant.Filled" Clearable="true"/>
     @if (_showDelete)
     {
         <MudTooltip Text="Delete Budgets" Delay="650">
@@ -33,7 +33,7 @@ else
         @foreach (var item in _budgetNameItems)
         {
             <MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0">
-                <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}")/>
+                <MudListItem Text="@item.Name" Href=@($"/budgets/{item.Name}") Style="padding: 16px;"/>
                 <MudCheckBox T="bool" Value="@item.IsSelected" ValueChanged="@(value => IsSelectedValueChangedHandler(item, value))" 
                              Size="Size.Medium" Dense="true" Class="opacity-50 ps-3 pe-3"/>
             </MudStack>

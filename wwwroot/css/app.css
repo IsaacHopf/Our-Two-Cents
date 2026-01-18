@@ -74,17 +74,11 @@ th {
         overflow-y: hidden;
     }
 
-.mud-toolbar {
-    height: fit-content;
-    padding: 8px 16px;
-}
-
 button {
     box-shadow: none !important;
 }
 
 .mud-icon-button-size-small {
-    padding: 5px !important;
     opacity: 0.9;
 }
 
