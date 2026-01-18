@@ -1,13 +1,19 @@
 ﻿@inject BudgetsRepository BudgetsRepository
 @inject FixedBudgetRepository FixedBudgetRepository
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 
 @page "/budgets/{budgetName}"
 
 <MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
     
 <MudStack Row="true">
-    <MudText Typo="Typo.h4">@BudgetName</MudText>
+    <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center">
+        <MudTooltip Text="Back" Delay="650">
+            <MudIconButton OnClick="@(() => NavigationManager.NavigateTo("/budgets"))" Icon="@Icons.Material.Rounded.ArrowBack" Class="me-4"/>
+        </MudTooltip>
+        <MudText Typo="Typo.h4">@BudgetName</MudText>
+    </MudStack>
     <MudStack Row="true" Class="ms-auto">
         <ReadOnlyCurrencyTextField Label="Total Income" Value="@_budget?.TotalIncome"/>
         <ReadOnlyCurrencyTextField Label="Total Expenses" Value="@(-_budget?.TotalExpenses)"/>
