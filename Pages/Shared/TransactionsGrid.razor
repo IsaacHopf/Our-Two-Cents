@@ -121,17 +121,22 @@
             <EditTemplate>
                 @if (Income)
                 {
-                    <MudTooltip Text="Delete Income" Delay="650">
-                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
-                    </MudTooltip>
+                    <div tabindex="-1">
+                        <MudTooltip Text="Delete Income" Delay="650">
+                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                           Size="Size.Small" Color="@Color.Error"/>
+                        </MudTooltip>
+                    </div>
+                    
                 }
                 else
                 {
-                    <MudTooltip Text="Delete Expense" Delay="650">
-                        <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                       Size="Size.Small" Color="@Color.Error" Class="pa-0 ma-0 opacity-75"/>
+                    <div tabindex="-1">
+                        <MudTooltip Text="Delete Expense" Delay="650">
+                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                           Size="Size.Small" Color="@Color.Error"/>
                     </MudTooltip>
+                    </div>
                 }
             </EditTemplate>
         </TemplateColumn>

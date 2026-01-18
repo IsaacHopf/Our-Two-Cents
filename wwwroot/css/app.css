@@ -83,6 +83,11 @@ button {
     box-shadow: none !important;
 }
 
+.mud-icon-button-size-small {
+    padding: 5px !important;
+    opacity: 0.9;
+}
+
 .toolbar-circle-button {
     border-radius: 50% !important;
     opacity: 0.85;
