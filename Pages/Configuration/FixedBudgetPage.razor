@@ -15,12 +15,12 @@ else
 {
     <MudTabs Rounded="true" Elevation="0" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
-            <TransactionsGrid Income="true" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_incomes"
-                              OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
+            <TransactionsGrid IsIncome="true" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_incomes"
+                              OnTransactionChanged="@UpdateIncomeAsync" OnDisableEdit="@ShowBudgetSavedPopup"/>
         </MudTabPanel>
         <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
-            <TransactionsGrid Income="false" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_expenses"
-                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync" HideChart="true"/>
+            <TransactionsGrid IsIncome="false" Year="@_fixedBudget.Year" Month="@_fixedBudget.Month" Transactions="@_expenses"
+                              OnTransactionChanged="@UpdateExpensesAsync" OnDisableEdit="@ShowBudgetSavedPopup" HideChart="true"/>
         </MudTabPanel>
     </MudTabs>
 }
@@ -38,29 +38,25 @@ else
         _expenses = new ObservableCollection<Transaction>(_fixedBudget.Expenses);
     }
 
-    private void UpdateIncome()
+    private async Task UpdateIncomeAsync()
     {
         _fixedBudget!.Incomes = _incomes.ToList();
         _hasBudgetChanged = true;
+        await FixedBudgetRepository.UpsertAsync(_fixedBudget!);
     }
 
-    private void UpdateExpenses()
+    private async Task UpdateExpensesAsync()
     {
         _fixedBudget!.Expenses = _expenses.ToList();
         _hasBudgetChanged = true;
+        await FixedBudgetRepository.UpsertAsync(_fixedBudget!);
     }
     
-    private async Task SaveBudgetAsync()
+    private void ShowBudgetSavedPopup()
     {
-        if (!_hasBudgetChanged)
-        {
-            Snackbar.Add("No changes to save.", Severity.Info);
-            return;
-        }
-
-        await FixedBudgetRepository.UpsertAsync(_fixedBudget!);
-
+        if (!_hasBudgetChanged) return;
+        
+        Snackbar.Add("Budget saved!", Severity.Success);
         _hasBudgetChanged = false;
-        Snackbar.Add("Fixed budget saved!", Severity.Success);
     }
 }
