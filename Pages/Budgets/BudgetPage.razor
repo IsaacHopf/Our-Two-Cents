@@ -33,16 +33,16 @@ else
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid Income="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
-                              OnTransactionChanged="@UpdateIncome" OnDisableEdit="@SaveBudgetAsync"/>
+                              OnTransactionChanged="@UpdateIncomeAsync" OnDisableEdit="@ShowBudgetSavedPopup"/>
         </MudTabPanel>
         <MudTabPanel Text="Expenses" Icon="@Icons.Material.Rounded.MoneyOff">
             <TransactionsGrid Income="false" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_expenses" FixedTransactions="@_fixedBudget?.Expenses"
-                              OnTransactionChanged="@UpdateExpenses" OnDisableEdit="@SaveBudgetAsync"/>
+                              OnTransactionChanged="@UpdateExpensesAsync" OnDisableEdit="@ShowBudgetSavedPopup"/>
         </MudTabPanel>
         <MudTabPanel Text="Notes" Icon="@Icons.Material.Rounded.Notes">
             <MudPaper Class="w-100" Elevation="0">
-                <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotes" OnBlur="@SaveBudgetAsync"
+                <MudTextField T="string?" Value="@_budget.Notes" ValueChanged="@UpdateNotesAsync" OnBlur="@ShowBudgetSavedPopup"
                               Variant="Variant.Outlined" Lines="10" AutoGrow="true"/>
             </MudPaper>
         </MudTabPanel>
@@ -79,37 +79,39 @@ else
         });
     }
 
-    private void UpdateIncome()
+    private async Task UpdateIncomeAsync()
     {
         _budget!.Incomes = _incomes.ToList();
         _hasBudgetChanged = true;
+        await SaveBudgetAsync();
     }
 
-    private void UpdateExpenses()
+    private async Task UpdateExpensesAsync()
     {
         _budget!.Expenses = _expenses.ToList();
         _hasBudgetChanged = true;
+        await SaveBudgetAsync();
     }
 
-    private void UpdateNotes(string? notes)
+    private async Task UpdateNotesAsync(string? notes)
     {
         if (_budget!.Notes == notes) return;
         
         _budget!.Notes = notes;
         _hasBudgetChanged = true;
+        await SaveBudgetAsync();
     }
     
     private async Task SaveBudgetAsync()
     {
-        if (!_hasBudgetChanged)
-        {
-            Snackbar.Add("No changes to save.", Severity.Info);
-            return;
-        }
-
         await BudgetsRepository.UpsertAsync(_budget!);
+    }
 
-        _hasBudgetChanged = false;
+    private void ShowBudgetSavedPopup()
+    {
+        if (!_hasBudgetChanged) return;
+        
         Snackbar.Add("Budget saved!", Severity.Success);
+        _hasBudgetChanged = false;
     }
 }
