@@ -74,8 +74,18 @@ th {
         overflow-y: hidden;
     }
 
-.mud-fab {
-    box-shadow: var(--mud-elevation-2) !important;
+.mud-toolbar {
+    height: fit-content;
+    padding: 8px 16px;
+}
+
+button {
+    box-shadow: none !important;
+}
+
+.toolbar-circle-button {
+    border-radius: 50% !important;
+    opacity: 0.85;
 }
 
 /* endregion */

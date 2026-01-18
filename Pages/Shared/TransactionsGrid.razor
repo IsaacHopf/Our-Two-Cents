@@ -16,24 +16,24 @@
         @if (Income)
         {
             <MudTooltip Text="Add Income (Enter)" Delay="650">
-                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Success" Class="me-4"/>
+                <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
             </MudTooltip>
             if (FixedTransactions is not null)
             {
                 <MudTooltip Text="Add Fixed Income" Delay="650">
-                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Success"/>
+                    <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button"/>
                 </MudTooltip>
             }
         }
         else
         {
             <MudTooltip Text="Add Expense (Enter)" Delay="650">
-                <MudFab OnClick="@AddTransactionAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.Add" Color="Color.Error" Class="me-4"/>
+                <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
             </MudTooltip>
             if (FixedTransactions is not null)
             {
                 <MudTooltip Text="Add Fixed Expenses" Delay="650">
-                    <MudFab OnClick="@AddFixedTransactionsAsync" Size="Size.Small" StartIcon="@Icons.Material.Rounded.PushPin" Color="Color.Error"/>
+                    <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button"/>
                 </MudTooltip>
             }
             @if (!HideChart)
