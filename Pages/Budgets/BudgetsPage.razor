@@ -70,7 +70,7 @@ else
         if (string.IsNullOrWhiteSpace(search)) _budgetNameItems = _allBudgetNameItems;
 
         _search = search;
-        _budgetNameItems = _allBudgetNameItems.Where(x => x.Name.Contains(search!)).ToList();
+        _budgetNameItems = _allBudgetNameItems.Where(x => x.Name.ToLower().Contains(search!.ToLower())).ToList();
         _showDelete = false;
     }
 
