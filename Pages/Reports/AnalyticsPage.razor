@@ -5,8 +5,18 @@
 @using BudgetApp.Services
 
 <MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
-
-<MudText Typo="Typo.h4" Class="mb-4">Analytics</MudText>
+    
+<MudStack Row="true">
+    <MudText Typo="Typo.h4" Class="mb-4">Analytics</MudText>
+    @if (_selectedBudgets.Any())
+    {
+        <MudStack Row="true" Class="ms-auto">
+            <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
+            <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
+            <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
+        </MudStack>
+    }
+</MudStack>
 
 @if (_budgets is null)
 {
@@ -24,14 +34,6 @@ else
                 <MudSelectItem Value="@budget">@budget.Name</MudSelectItem>
             }
         </MudSelect>
-        @if (_selectedBudgets.Any())
-        {
-            <MudStack Row="true" Class="ms-auto">
-                <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
-                <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
-                <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
-            </MudStack>
-        }
     </MudStack>
     
     @if (_selectedBudgets.Any())
