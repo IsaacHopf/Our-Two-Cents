@@ -5,11 +5,11 @@
 
 <MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
     
-<MudStack Row="true">
-    <MudText Typo="Typo.h4" Class="mb-4">Analytics</MudText>
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+    <MudText Typo="Typo.h4" Class="m-0">Analytics</MudText>
     @if (_selectedBudgets.Any())
     {
-        <MudStack Row="true" Class="ms-auto">
+        <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="ms-auto me-2">
             <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
             <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
             <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>

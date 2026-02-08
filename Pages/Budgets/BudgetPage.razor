@@ -14,7 +14,7 @@
         </MudTooltip>
         <MudText Typo="Typo.h4">@BudgetName</MudText>
     </MudStack>
-    <MudStack Row="true" Class="ms-auto">
+    <MudStack Row="true" Spacing="5" Class="ms-auto me-2">
         <ReadOnlyCurrencyTextField Label="Total Income" Value="@_budget?.TotalIncome"/>
         <ReadOnlyCurrencyTextField Label="Total Expenses" Value="@(-_budget?.TotalExpenses)"/>
         <ReadOnlyCurrencyTextField Label="Net" Value="@_budget?.Net"/>

@@ -1,5 +1,10 @@
-﻿<MudTextField Value="@Value" Label="@Label" ReadOnly="true" Variant="Variant.Outlined" Margin="Margin.Dense"
-              Adornment="Adornment.Start" AdornmentIcon="@_icon" AdornmentColor="@_iconColor"/>
+﻿<div>
+    <div style="padding-left: 5px;">@Label</div>
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="0">
+        <MudIcon Icon="@_icon" Color="@_iconColor" Size="Size.Medium"/>
+        <MudText Typo="Typo.h6" Style="text-box: trim-both cap alphabetic;">@Value</MudText>
+    </MudStack>
+</div>
 
 @code {
     [Parameter] public decimal? Value { get; set; }
