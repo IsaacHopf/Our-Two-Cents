@@ -3,7 +3,7 @@
 @page "/analytics"
 @using BudgetApp.Pages.Reports.Components
     
-<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-6">
     <MudText Typo="Typo.h4" Class="m-0">Analytics</MudText>
     @if (_selectedBudgets.Any())
     {
@@ -23,7 +23,7 @@
 }
 else
 {
-    <MudStack Row="true" Class="mb-4">
+    <MudStack Row="true" Class="mb-6">
         <MudSelect Label="Budgets" @bind-SelectedValues="@_selectedBudgets" MultiSelection="true" SelectAll="true" 
                    Clearable="true" Variant="Variant.Filled">
             @foreach (var budget in _budgets)
@@ -38,28 +38,29 @@ else
         <MudTabs Rounded="true" ApplyEffectsToContainer="true" MinimumTabWidth="96px">
             <MudTabPanel Text="Averages" Icon="@Icons.Material.Outlined.Calculate">
                 
-                <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="pt-4 pb-4">
-                    <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
-                    <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
-                    <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
-                </MudStack>
-                
-                <div>Category Averages</div>
-                <MudTable T="CategoryAverage" Items="@CategoryAverages" Elevation="0" Hover="true" Dense="true" Bordered="true" Style="width: 27rem;">
-                    <HeaderContent>
-                        <MudTh>Category</MudTh>
-                        <MudTh>Average</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd>
-                            <MudStack Row="true" AlignItems="AlignItems.Center">
-                                <div style="background-color: @context.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                                <span class="text-nowrap">@context.Name</span>
-                            </MudStack>
-                        </MudTd>
-                        <MudTd>@context.Average.ToString("C")</MudTd>
-                    </RowTemplate>
-                </MudTable>
+                <div class="pa-6" style="border: solid 1px var(--mud-palette-divider); border-radius: var(--mud-default-borderradius); width: fit-content;">
+                    <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="mb-6">
+                        <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
+                        <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
+                        <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
+                    </MudStack>
+                    <div>Category Averages</div>
+                    <MudTable T="CategoryAverage" Items="@CategoryAverages" Elevation="0" Hover="true" Dense="true" Bordered="true" Style="width: 27rem;">
+                        <HeaderContent>
+                            <MudTh>Category</MudTh>
+                            <MudTh>Average</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>
+                                <MudStack Row="true" AlignItems="AlignItems.Center">
+                                    <div style="background-color: @context.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                    <span class="text-nowrap">@context.Name</span>
+                                </MudStack>
+                            </MudTd>
+                            <MudTd>@context.Average.ToString("C")</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </div>
                 
             </MudTabPanel>
             <MudTabPanel Text="Chart" Icon="@Icons.Material.Outlined.AreaChart">

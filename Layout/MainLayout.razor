@@ -6,7 +6,7 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudDrawer Open="true" Variant="DrawerVariant.Persistent" Elevation="0" Width="68px">
+    <MudDrawer Open="true" Variant="DrawerVariant.Persistent" Elevation="0" Width="74px">
         <MudStack AlignItems="AlignItems.Center" Spacing="0" Class="h-100">
             <MudIcon Icon="@Icons.Material.TwoTone.SupervisorAccount" Size="Size.Large" Color="Color.Secondary" Class="brand"/>
             <NavMenu/>
@@ -14,7 +14,7 @@
                                  ToggledIcon="@Icons.Material.Rounded.LightMode" Class="opacity-75 mt-auto mb-2"/>
         </MudStack>
     </MudDrawer>
-    <MudMainContent Class="pa-4 h-100">
+    <MudMainContent Class="pa-6 h-100">
         <ErrorBoundary @ref="@_errorBoundary">
             <ChildContent>
                 @Body

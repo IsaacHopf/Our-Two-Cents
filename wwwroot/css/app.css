@@ -5,12 +5,12 @@ html, body, #app {
 }
 
 .brand {
-    height: 68px;
+    height: 85px;
 }
 
 .mud-nav-item {
-    width: 68px;
-    height: 68px;
+    width: 74px;
+    height: 74px;
     padding: unset;
 }
 
@@ -85,6 +85,14 @@ button {
 .toolbar-circle-button {
     border-radius: 50% !important;
     opacity: 0.85;
+}
+
+hr {
+    opacity: 1 !important;
+}
+
+hr:not([size]) {
+    height: 0 !important;
 }
 
 /* endregion */

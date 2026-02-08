@@ -7,10 +7,10 @@
 
 <MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
     
-<MudStack Row="true">
+<MudStack Row="true" Class="mb-6">
     <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center">
         <MudTooltip Text="Back" Delay="650">
-            <MudIconButton OnClick="@(() => NavigationManager.NavigateTo("/budgets"))" Icon="@Icons.Material.Rounded.ArrowBack" Class="me-4"/>
+            <MudIconButton OnClick="@(() => NavigationManager.NavigateTo("/budgets"))" Icon="@Icons.Material.Rounded.ArrowBack" Size="Size.Medium" Class="me-4 pa-2"/>
         </MudTooltip>
         <MudText Typo="Typo.h4">@BudgetName</MudText>
     </MudStack>
