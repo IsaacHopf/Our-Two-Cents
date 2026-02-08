@@ -2,17 +2,15 @@
 
 @page "/analytics"
 @using BudgetApp.Pages.Reports.Components
-
-<MudStack StretchItems="StretchItems.End" Spacing="0" Class="h-100">
     
 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
     <MudText Typo="Typo.h4" Class="m-0">Analytics</MudText>
     @if (_selectedBudgets.Any())
     {
         <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="ms-auto me-2">
-            <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
-            <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
-            <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
+            <ReadOnlyCurrencyTextField Label="Total Income" Value="@Math.Round(_selectedBudgets.Sum(x => x.TotalIncome), 2)"/>
+            <ReadOnlyCurrencyTextField Label="Total Expenses" Value="@(Math.Round(_selectedBudgets.Sum(x => -x.TotalExpenses), 2))"/>
+            <ReadOnlyCurrencyTextField Label="Total Net" Value="@Math.Round(_selectedBudgets.Sum(x => x.Net), 2)"/>
         </MudStack>
     }
 </MudStack>
@@ -25,7 +23,7 @@
 }
 else
 {
-    <MudStack Row="true">
+    <MudStack Row="true" Class="mb-4">
         <MudSelect Label="Budgets" @bind-SelectedValues="@_selectedBudgets" MultiSelection="true" SelectAll="true" 
                    Clearable="true" Variant="Variant.Filled">
             @foreach (var budget in _budgets)
@@ -37,69 +35,82 @@ else
     
     @if (_selectedBudgets.Any())
     {
-        <MudStack StretchItems="StretchItems.End" Class="h-100 mt-1" Style="overflow-y: hidden" Spacing="0">
-            
-            <div>
-                <MudToggleGroup T="bool" @bind-Value="_showChart" Outlined="false" CheckMark="true" Style="width: fit-content;">
-                    <MudTooltip Text="Show Chart" Delay="650">
-                        <MudToggleItem Value="true" Text="" SelectedIcon="@Icons.Material.Rounded.AreaChart" UnselectedIcon="@Icons.Material.Rounded.AreaChart"/>
-                    </MudTooltip>
-                    <MudTooltip Text="Show Table" Delay="650">
-                        <MudToggleItem Value="false" Text="" SelectedIcon="@Icons.Material.Rounded.TableRows" UnselectedIcon="@Icons.Material.Rounded.TableRows"/>
-                    </MudTooltip>
-                </MudToggleGroup>
-            </div>
-            
-            @if (_showChart)
-            {
-                <div class="h-100 w-100 mt-1">
-                    <BudgetTotalsChart Budgets="_selectedBudgets" Width="100%" Height="95%"/>
-                </div>
-            }
-            else
-            {
-                <MudDataGrid Items="@_selectedBudgets" Hover="true" Bordered="true" Elevation="0" 
-                         Class="mt-1 mud-table-overflow-hidden-container" Style="background-color: var(--mud-palette-primary-hover);">
-                    <Columns>
-                        <HierarchyColumn EnableHeaderToggle="true"/>
-                        <PropertyColumn Title="Budget" Property="x => x.Name"/>
-                        <PropertyColumn Title="Total Income" Property="x => x.TotalIncome" Format="C"/>
-                        <PropertyColumn Title="Total Expenses" Property="x => -x.TotalExpenses" Format="C"/>
-                        <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
-                    </Columns>
-                    <ChildRowContent>
-                        <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 400px;">
-                            <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
-                            <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
-                                <Columns>
-                                    <PropertyColumn Property="x => x.Source" />
-                                    <PropertyColumn Property="x => x.Amount" Format="C" />
-                                    <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
-                                        <CellTemplate Context="cellContext">
-                                            <MudStack Row="true" AlignItems="AlignItems.Center">
-                                                <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                                                <span>@cellContext.Item.Category.Name</span>
-                                            </MudStack>
-                                        </CellTemplate>
-                                    </PropertyColumn>
-                                </Columns>
-                            </MudDataGrid>
-                        </MudStack>
-                    </ChildRowContent>
-                </MudDataGrid>
-            }
-            
-        </MudStack>
+        <MudTabs Rounded="true" ApplyEffectsToContainer="true" MinimumTabWidth="96px">
+            <MudTabPanel Text="Averages" Icon="@Icons.Material.Outlined.Calculate">
+                
+                <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="pt-4 pb-4">
+                    <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
+                    <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
+                    <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
+                </MudStack>
+                
+                <div>Category Averages</div>
+                <MudTable T="CategoryAverage" Items="@CategoryAverages" Elevation="0" Hover="true" Dense="true" Bordered="true" Style="width: 27rem;">
+                    <HeaderContent>
+                        <MudTh>Category</MudTh>
+                        <MudTh>Average</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudStack Row="true" AlignItems="AlignItems.Center">
+                                <div style="background-color: @context.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                <span class="text-nowrap">@context.Name</span>
+                            </MudStack>
+                        </MudTd>
+                        <MudTd>@context.Average.ToString("C")</MudTd>
+                    </RowTemplate>
+                </MudTable>
+                
+            </MudTabPanel>
+            <MudTabPanel Text="Chart" Icon="@Icons.Material.Outlined.AreaChart">
+                
+                <BudgetTotalsChart Budgets="_selectedBudgets" Width="100%" Height="600px"/>
+                
+            </MudTabPanel>
+            <MudTabPanel Text="Details" Icon="@Icons.Material.Outlined.TableRows">
+                
+                <MudStack StretchItems="StretchItems.End" Class="h-100 mt-1" Spacing="0">
+                    <MudDataGrid Items="@_selectedBudgets" Hover="true" Bordered="true" Elevation="0"
+                                 Class="mt-1" Style="background-color: var(--mud-palette-primary-hover);">
+                        <Columns>
+                            <HierarchyColumn EnableHeaderToggle="true"/>
+                            <PropertyColumn Title="Budget" Property="x => x.Name"/>
+                            <PropertyColumn Title="Total Income" Property="x => x.TotalIncome" Format="C"/>
+                            <PropertyColumn Title="Total Expenses" Property="x => -x.TotalExpenses" Format="C"/>
+                            <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
+                        </Columns>
+                        <ChildRowContent>
+                            <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 400px;">
+                                <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
+                                <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                    <Columns>
+                                        <PropertyColumn Property="x => x.Source"/>
+                                        <PropertyColumn Property="x => x.Amount" Format="C"/>
+                                        <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
+                                            <CellTemplate Context="cellContext">
+                                                <MudStack Row="true" AlignItems="AlignItems.Center">
+                                                    <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                                    <span>@cellContext.Item.Category.Name</span>
+                                                </MudStack>
+                                            </CellTemplate>
+                                        </PropertyColumn>
+                                    </Columns>
+                                </MudDataGrid>
+                            </MudStack>
+                        </ChildRowContent>
+                    </MudDataGrid>
+                </MudStack>
+                
+            </MudTabPanel>
+        </MudTabs>
     }
 }
-
-</MudStack>
 
 @code 
 {
     private IEnumerable<Budget>? _budgets;
     private IEnumerable<Budget> _selectedBudgets = [];
-    private bool _showChart = true;
+    private IEnumerable<CategoryAverage> CategoryAverages => CalculateCategoryAverages();
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,4 +121,33 @@ else
 
         _selectedBudgets = _budgets.Take(6);
     }
+
+    private IEnumerable<CategoryAverage> CalculateCategoryAverages()
+    {
+        List<CategoryTotal> categoryTotals = [];
+        foreach (var budget in _selectedBudgets)
+        {
+            categoryTotals.AddRange(
+                budget.Expenses
+                    .GroupBy(expense => expense.CategoryName)
+                    .Select(group => new CategoryTotal(
+                        group.Key, 
+                        group.First().Category.Color, 
+                        group.Sum(expense => expense.Amount))));
+        }
+
+        var categoryAverages = categoryTotals
+            .GroupBy(categoryTotal => categoryTotal.Name)
+            .Select(group => new CategoryAverage(
+                group.Key, 
+                group.First().Color, 
+                Math.Round(group.Average(categoryTotal => categoryTotal.Total), 2)))
+            .OrderByDescending(categoryAverage => categoryAverage.Average);
+
+        return categoryAverages;
+    }
+
+    
+    private record CategoryTotal(string Name, string Color, decimal Total);
+    private record CategoryAverage(string Name, string Color, decimal Average);
 }

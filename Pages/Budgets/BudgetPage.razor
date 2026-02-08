@@ -29,7 +29,7 @@
 }
 else
 {
-    <MudTabs Rounded="true" Elevation="0" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
+    <MudTabs Rounded="true" ApplyEffectsToContainer="true" MinimumTabWidth="96px" Class="mud-tabs-scrollable-content">
         <MudTabPanel Text="Income" Icon="@Icons.Material.Rounded.AttachMoney">
             <TransactionsGrid IsIncome="true" Year="@_budget.Year" Month="@_budget.Month" Budget="@_budget"
                               Transactions="@_incomes" FixedTransactions="@_fixedBudget?.Incomes"
