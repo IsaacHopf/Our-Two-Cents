@@ -38,7 +38,7 @@ else
         <MudTabs Rounded="true" ApplyEffectsToContainer="true" MinimumTabWidth="96px">
             <MudTabPanel Text="Averages" Icon="@Icons.Material.Outlined.Calculate">
                 
-                <div class="pa-6" style="border: solid 1px var(--mud-palette-divider); border-radius: var(--mud-default-borderradius); width: fit-content;">
+                <div class="pa-6 mt-2">
                     <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="mb-6">
                         <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
                         <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
