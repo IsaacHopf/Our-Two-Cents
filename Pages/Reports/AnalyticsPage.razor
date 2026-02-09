@@ -35,17 +35,25 @@ else
     
     @if (_selectedBudgets.Any())
     {
-        <MudTabs Rounded="true" ApplyEffectsToContainer="true" MinimumTabWidth="96px">
-            <MudTabPanel Text="Averages" Icon="@Icons.Material.Outlined.Calculate">
-                
-                <div class="pa-6 mt-2">
-                    <MudStack Row="true" Spacing="5" AlignItems="AlignItems.Center" Class="mb-6">
-                        <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome), 2)"/>
-                        <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses), 2))"/>
-                        <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net), 2)"/>
+        <MudGrid Spacing="6">
+            
+            <MudItem xs="12" lg="5" xl="4" xxl="3">
+                <div class="pa-4 w-100 h-100" style="border: solid 1px var(--mud-palette-divider); border-radius: var(--mud-default-borderradius); width: fit-content;">
+                    @if (_excludeOutliers)
+                    {
+                        <MudText Typo="Typo.caption" HtmlTag="div" Class="mb-1 fw-bold">Outliers excluded!</MudText>
+                    }
+                    <MudStack Row="true" Spacing="4" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-4 w-100">
+                        <ReadOnlyCurrencyTextField Label="Average Income" Value="@Math.Round(_selectedBudgets.Average(x => x.TotalIncome, _excludeOutliers), 2)"/>
+                        <ReadOnlyCurrencyTextField Label="Average Expenses" Value="@(Math.Round(_selectedBudgets.Average(x => -x.TotalExpenses, _excludeOutliers), 2))"/>
+                        <ReadOnlyCurrencyTextField Label="Average Net" Value="@Math.Round(_selectedBudgets.Average(x => x.Net, _excludeOutliers), 2)"/>
+                        <MudTooltip Text="@(_excludeOutliers ? "Include Outliers" : "Exclude Outliers")" Delay="650">
+                            <MudIconButton OnClick="@(() => _excludeOutliers = !_excludeOutliers)"
+                                           Icon="@(_excludeOutliers ? Icons.Material.Rounded.Notifications : Icons.Material.Rounded.NotificationsOff)"/>
+                        </MudTooltip>
                     </MudStack>
                     <div>Category Averages</div>
-                    <MudTable T="CategoryAverage" Items="@CategoryAverages" Elevation="0" Hover="true" Dense="true" Bordered="true" Style="width: 27rem;">
+                    <MudTable T="CategoryAverage" Items="@CategoryAverages" Elevation="0" Hover="true" Dense="true" Bordered="true" Class="w-100">
                         <HeaderContent>
                             <MudTh>Category</MudTh>
                             <MudTh>Average</MudTh>
@@ -61,18 +69,18 @@ else
                         </RowTemplate>
                     </MudTable>
                 </div>
-                
-            </MudTabPanel>
-            <MudTabPanel Text="Chart" Icon="@Icons.Material.Outlined.AreaChart">
-                
-                <BudgetTotalsChart Budgets="_selectedBudgets" Width="100%" Height="600px"/>
-                
-            </MudTabPanel>
-            <MudTabPanel Text="Details" Icon="@Icons.Material.Outlined.TableRows">
-                
-                <MudStack StretchItems="StretchItems.End" Class="h-100 mt-1" Spacing="0">
+            </MudItem>
+
+            <MudItem xs="12" lg="7" xl="8" xxl="9">
+                <div class="pa-4 w-100 h-100" style="border: solid 1px var(--mud-palette-divider); border-radius: var(--mud-default-borderradius); width: fit-content;">
+                    <BudgetTotalsChart Budgets="_selectedBudgets" Width="100%" Height="500px"/>
+                </div>
+            </MudItem>
+            
+            <MudItem xs="12" Class="mb-6">
+                <MudStack StretchItems="StretchItems.End" Class="h-100" Spacing="0">
                     <MudDataGrid Items="@_selectedBudgets" Hover="true" Bordered="true" Elevation="0"
-                                 Class="mt-1" Style="background-color: var(--mud-palette-primary-hover);">
+                                 Style="background-color: var(--mud-palette-primary-hover);">
                         <Columns>
                             <HierarchyColumn EnableHeaderToggle="true"/>
                             <PropertyColumn Title="Budget" Property="x => x.Name"/>
@@ -118,9 +126,9 @@ else
                         </ChildRowContent>
                     </MudDataGrid>
                 </MudStack>
-                
-            </MudTabPanel>
-        </MudTabs>
+            </MudItem>
+            
+        </MudGrid>
     }
 }
 
@@ -130,7 +138,8 @@ else
     private IEnumerable<Budget> _selectedBudgets = [];
     private IEnumerable<CategoryAverage> CategoryAverages => CalculateCategoryAverages();
 
-    private const string DetailsTabChildRowContentHeight = "400px";
+    private bool _excludeOutliers;
+    private const string DetailsTabChildRowContentHeight = "350px";
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,7 +170,7 @@ else
             .Select(group => new CategoryAverage(
                 group.Key, 
                 group.First().Color, 
-                Math.Round(group.Average(categoryTotal => categoryTotal.Total), 2)))
+                Math.Round(group.Average(categoryTotal => categoryTotal.Total, _excludeOutliers), 2)))
             .OrderByDescending(categoryAverage => categoryAverage.Average);
 
         return categoryAverages;
