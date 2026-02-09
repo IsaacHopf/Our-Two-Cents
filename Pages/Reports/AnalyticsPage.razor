@@ -81,22 +81,39 @@ else
                             <PropertyColumn Title="Net" Property="x => x.Net" Format="C"/>
                         </Columns>
                         <ChildRowContent>
-                            <MudStack Row="true" Spacing="6" StretchItems="StretchItems.End" Style="height: 400px;">
-                                <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true"/>
-                                <MudDataGrid Items="@context.Item.Expenses" Height="100%" Dense="true" Hover="true" Bordered="true" Elevation="0">
-                                    <Columns>
-                                        <PropertyColumn Property="x => x.Source"/>
-                                        <PropertyColumn Property="x => x.Amount" Format="C"/>
-                                        <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
-                                            <CellTemplate Context="cellContext">
-                                                <MudStack Row="true" AlignItems="AlignItems.Center">
-                                                    <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                                                    <span>@cellContext.Item.Category.Name</span>
-                                                </MudStack>
-                                            </CellTemplate>
-                                        </PropertyColumn>
-                                    </Columns>
-                                </MudDataGrid>
+                            <MudStack Row="true" Spacing="6" StretchItems="StretchItems.All" Style="@($"height: {DetailsTabChildRowContentHeight}; padding-left: 42px;")">
+                                <div>
+                                    <div class="mb-1">Income</div>
+                                    <MudDataGrid Items="@context.Item.Incomes" Height="@($"calc({DetailsTabChildRowContentHeight} - 24px)")" 
+                                                 Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                        <Columns>
+                                            <PropertyColumn Property="x => x.Source"/>
+                                            <PropertyColumn Property="x => x.Amount" Format="C"/>
+                                        </Columns>
+                                    </MudDataGrid>
+                                </div>
+                                <div>
+                                    <div class="mb-1">Expenses</div>
+                                    <MudDataGrid Items="@context.Item.Expenses" Height="@($"calc({DetailsTabChildRowContentHeight} - 24px)")" 
+                                                 Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                        <Columns>
+                                            <PropertyColumn Property="x => x.Source"/>
+                                            <PropertyColumn Property="x => x.Amount" Format="C"/>
+                                            <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
+                                                <CellTemplate Context="cellContext">
+                                                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                                                        <div style="background-color: @cellContext.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                                                        <span>@cellContext.Item.Category.Name</span>
+                                                    </MudStack>
+                                                </CellTemplate>
+                                            </PropertyColumn>
+                                        </Columns>
+                                    </MudDataGrid>
+                                </div>
+                                <div>
+                                    <div class="mb-1">Categories</div>
+                                    <TotalExpensesByCategoryChart Budget="@context.Item" HideTitle="true" TableHeight="@($"calc({DetailsTabChildRowContentHeight} - 24px)")"/>
+                                </div>
                             </MudStack>
                         </ChildRowContent>
                     </MudDataGrid>
@@ -112,6 +129,8 @@ else
     private IEnumerable<Budget>? _budgets;
     private IEnumerable<Budget> _selectedBudgets = [];
     private IEnumerable<CategoryAverage> CategoryAverages => CalculateCategoryAverages();
+
+    private const string DetailsTabChildRowContentHeight = "400px";
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,6 +168,6 @@ else
     }
 
     
-    private record CategoryTotal(string Name, string Color, decimal Total);
-    private record CategoryAverage(string Name, string Color, decimal Average);
+    public record CategoryTotal(string Name, string Color, decimal Total);
+    public record CategoryAverage(string Name, string Color, decimal Average);
 }

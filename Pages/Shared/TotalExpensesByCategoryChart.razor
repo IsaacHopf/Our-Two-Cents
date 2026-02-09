@@ -37,7 +37,7 @@
                          ShowDataLabels="true"/>
     </ApexChart>
     
-    <MudTable T="CategoryWithAmount" Items="@_categories" OnRowMouseEnter="@OnTableRowMouseEnter"
+    <MudTable T="CategoryWithAmount" Items="@_categories" OnRowMouseEnter="@OnTableRowMouseEnter" Height="@TableHeight"
               Elevation="0" Hover="true" Dense="true" Bordered="true" @onmouseleave="OnTableMouseLeave">
         <HeaderContent>
             <MudTh>Category</MudTh>
@@ -70,6 +70,7 @@
 @code {
     [Parameter] public required Budget Budget { get; set; }
     [Parameter] public string ChartDiameter { get; set; } = "310px";
+    [Parameter] public string? TableHeight { get; set; }
     [Parameter] public bool IsTableBelowChart { get; set; } = false;
     [Parameter] public bool HideTitle { get; set; } = false;
 
