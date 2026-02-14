@@ -18,7 +18,7 @@ else
 {
     <MudDataGrid T="Category" @ref="_gridRef" Items="@_categories" ReadOnly="false" EditMode="DataGridEditMode.Form" EditTrigger="DataGridEditTrigger.OnRowClick"
                  CommittedItemChanges="@CommittedItemChangesAsync" CanceledEditingItem="@CanceledEditingItem" EditDialogOptions="@_dialogOptions"
-                 Hover="true" Bordered="true" Elevation="0" Class="w-100" Style="background-color: var(--mud-palette-primary-hover)">
+                 ShowColumnOptions="false" Hover="true" Bordered="true" Elevation="0" Class="w-100" Style="background-color: var(--mud-palette-primary-hover)">
         
         <ToolBarContent>
             <MudTooltip Text="Add Category" Delay="650">

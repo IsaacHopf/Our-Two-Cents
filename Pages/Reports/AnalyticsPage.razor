@@ -80,7 +80,7 @@ else
             <MudItem xs="12" Class="mb-6">
                 <MudStack StretchItems="StretchItems.End" Class="h-100" Spacing="0">
                     <MudDataGrid Items="@_selectedBudgets" Hover="true" Bordered="true" Elevation="0"
-                                 Style="background-color: var(--mud-palette-primary-hover);">
+                                 ShowColumnOptions="false" Style="background-color: var(--mud-palette-primary-hover);">
                         <Columns>
                             <HierarchyColumn EnableHeaderToggle="true"/>
                             <PropertyColumn Title="Budget" Property="x => x.Name"/>
@@ -93,7 +93,7 @@ else
                                 <div>
                                     <div class="mb-1">Income</div>
                                     <MudDataGrid Items="@context.Item.Incomes" Height="@($"calc({DetailsTabChildRowContentHeight} - 24px)")" 
-                                                 Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                                 ShowColumnOptions="false" Dense="true" Hover="true" Bordered="true" Elevation="0">
                                         <Columns>
                                             <PropertyColumn Property="x => x.Source"/>
                                             <PropertyColumn Property="x => x.Amount" Format="C"/>
@@ -103,7 +103,7 @@ else
                                 <div>
                                     <div class="mb-1">Expenses</div>
                                     <MudDataGrid Items="@context.Item.Expenses" Height="@($"calc({DetailsTabChildRowContentHeight} - 24px)")" 
-                                                 Dense="true" Hover="true" Bordered="true" Elevation="0">
+                                                 ShowColumnOptions="false" Dense="true" Hover="true" Bordered="true" Elevation="0">
                                         <Columns>
                                             <PropertyColumn Property="x => x.Source"/>
                                             <PropertyColumn Property="x => x.Amount" Format="C"/>
