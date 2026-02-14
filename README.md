@@ -1,21 +1,21 @@
 # BudgetApp
 
-**BudgetApp**, or **Our Two Cents**, is a simple budgeting tool with a spreadsheet-like interface.
+**BudgetApp**, or **Our Two Cents**, is a simple budgeting tool with a spreadsheet-like interface for tracking, visualizing, and analyzing monthly income and expenses.
 
 ## ✨ Features
-- Create and manage budgets with a spreadsheet-style grid.
+- Create and manage monthly budgets with a spreadsheet-style grid.
 - Manage expense categories and use them in budgets.
 - Manage fixed income or expenses and add them to budgets.
 - Visualize data with interactive charts.
-- Generate useful financial reports.
+- Calculate totals and averages automatically.
+- Compare incomes and expenses from each month.
 - Pick between light or dark mode. 
 
 ## 📸 Screenshots
 ![Budgets](assets/budgets.png)
-![Budgets - Dark](assets/budgets-dark.PNG)
 ![Budget - Income](assets/budget-income.PNG)
-![Budget - Expenses](assets/budget-expenses.PNG)
 ![Analytics](assets/analytics.PNG)
+*Find more screenshots in /assets*
 
 ## 🧰 Tech Stack
 - Frontend: Blazor, MudBlazor
@@ -47,7 +47,7 @@
        "BudgetsContainerName": "Budgets"
    }
    ```
-4. Add the Azure Cosmos DB connection string to [appsettings.json](appsettings.json):
+4. Add the Azure Cosmos DB connection string to [appsettings.json](appsettings.json) (do **not** share the connection string online):
    ```json
    {
       "CosmosConnectionString": "<azure-cosmos-db-connection-string>"
