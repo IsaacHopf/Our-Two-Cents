@@ -6,151 +6,158 @@
 
 <MudStack Row="true" Spacing="0" Class="h-100" Style="overflow-x: hidden;">
     
-<MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
-             ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Elevation="0"
-             Filterable="true" ShowFilterIcons="false" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive"
-             Class="w-100 mud-data-grid-edit-onclick" 
-             Style="@(IsIncome ? "background-color: var(--mud-palette-success-hover)" : "background-color: var(--mud-palette-error-hover)")">
-    
-    <ToolBarContent>
-        @if (IsIncome)
-        {
-            <MudTooltip Text="Add Income (Enter)" Delay="650">
-                <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
-            </MudTooltip>
-            if (FixedTransactions is not null)
+    <MudDataGrid @ref="_gridRef" @onclick="EnableEdit" CommittedItemChanges="@OnTransactionChanged" Items="@Transactions"
+                 ReadOnly="@(!_editable)" EditMode="DataGridEditMode.Cell" Hover="true" Bordered="true" Elevation="0"
+                 Filterable="true" ShowFilterIcons="false" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive"
+                 Class="@($"w-100 mud-data-grid-edit-onclick {(IsIncome ? "income-grid" : "expenses-grid")}")" RowClassFunc="@ApplyRowClass">
+        
+        <ToolBarContent>
+            @if (IsIncome)
             {
-                <MudTooltip Text="Add Fixed Income" Delay="650">
-                    <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button"/>
+                <MudTooltip Text="Add Income (Enter)" Delay="650">
+                    <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
                 </MudTooltip>
-            }
-        }
-        else
-        {
-            <MudTooltip Text="Add Expense (Enter)" Delay="650">
-                <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
-            </MudTooltip>
-            if (FixedTransactions is not null)
-            {
-                <MudTooltip Text="Add Fixed Expenses" Delay="650">
-                    <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button"/>
-                </MudTooltip>
-            }
-            @if (!HideChart)
-            {
-                <div class="ms-auto">
-                    <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
-                        <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
-                            <MudStack Row="true" Spacing="0">
-                                <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
-                                @if (_showChart)
-                                {
-                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
-                                }
-                                else
-                                {
-                                    <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
-                                }
-                            </MudStack>
-                        </MudButton>
-                    </MudTooltip>
-                </div> 
-            }
-        }
-    </ToolBarContent>
-    
-    <Columns>
-        <PropertyColumn Property="x => x.Source" Required="false"/>
-        <PropertyColumn Property="x => x.Amount" Format="C">
-            <EditTemplate>
-                <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
-                                 ValueChanged="x => 
-                                 { 
-                                     context.Item.Amount = x; 
-                                     _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
-                                 }"/>
-            </EditTemplate>
-        </PropertyColumn>
-        @if (!IsIncome)
-        {
-            <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
-                <CellTemplate>
-                    <MudStack Row="true" AlignItems="AlignItems.Center">
-                        <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
-                        <span>@context.Item.Category.Name</span>
-                    </MudStack>
-                </CellTemplate>
-                <EditTemplate>
-                    <MudStack Row="true" AlignItems="AlignItems.Center">
-                        <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
-                        @* Modal must be false or else edit mode will be disabled when clicking on MudAutocomplete. *@
-                        <MudAutocomplete T="Category" Value="@context.Item.Category" Modal="false" MaxItems="null"
-                                         ValueChanged="x => 
-                                         { 
-                                             context.Item.Category = x;
-                                             _gridRef!.CommittedItemChanges.InvokeAsync(context.Item);
-                                         }"
-                                         SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name" 
-                                         SelectOnActivation="true" SelectValueOnTab="true" Required="true">
-                            <ItemTemplate Context="e">
-                                <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
-                            </ItemTemplate>
-                        </MudAutocomplete>
-                    </MudStack>
-                </EditTemplate>
-            </PropertyColumn>
-        }
-        <PropertyColumn Property="x => x.Date" Format="MMM. d">
-            <EditTemplate>
-                <MudNumericField T="int?" Min="1" Value="context.Item.Date?.Day"
-                                 ValueChanged="x => 
-                                 { 
-                                     try 
-                                     { 
-                                         context.Item.Date = x is null ? null : new DateTime(Year, Month, x.Value); 
-                                         _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); 
-                                     }
-                                     catch (ArgumentOutOfRangeException) 
-                                     { 
-                                         context.Item.Date = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month));
-                                     } 
-                                 }"/>
-            </EditTemplate>
-        </PropertyColumn>
-        <TemplateColumn>
-            <EditTemplate>
-                @if (IsIncome)
+                if (FixedTransactions is not null)
                 {
-                    <div tabindex="-1">
-                        <MudTooltip Text="Delete Income" Delay="650">
-                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                           Size="Size.Small" Color="@Color.Error"/>
+                    <MudTooltip Text="Add Fixed Income" Delay="650">
+                        <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Success" Variant="Variant.Filled" Class="toolbar-circle-button"/>
+                    </MudTooltip>
+                }
+            }
+            else
+            {
+                <MudTooltip Text="Add Expense (Enter)" Delay="650">
+                    <MudIconButton OnClick="@AddTransactionAsync" Icon="@Icons.Material.Rounded.Add" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button me-4"/>
+                </MudTooltip>
+                if (FixedTransactions is not null)
+                {
+                    <MudTooltip Text="Add Fixed Expenses" Delay="650">
+                        <MudIconButton OnClick="@AddFixedTransactionsAsync" Icon="@Icons.Material.Rounded.PushPin" Color="Color.Error" Variant="Variant.Filled" Class="toolbar-circle-button"/>
+                    </MudTooltip>
+                }
+
+                @if (!HideChart)
+                {
+                    <div class="ms-auto">
+                        <MudTooltip Text="@(_showChart ? "Hide Chart" : "Show Chart")" Delay="650" Class="ms-auto">
+                            <MudButton OnClick="@(() => _showChart = !_showChart)" Variant="Variant.Text">
+                                <MudStack Row="true" Spacing="0">
+                                    <MudIcon Icon="@Icons.Material.Rounded.PieChart" Color="Color.Default"/>
+                                    @if (_showChart)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowRight" Color="Color.Default"/>
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Rounded.KeyboardArrowLeft" Color="Color.Default"/>
+                                    }
+                                </MudStack>
+                            </MudButton>
                         </MudTooltip>
                     </div>
-                    
                 }
-                else
-                {
-                    <div tabindex="-1">
-                        <MudTooltip Text="Delete Expense" Delay="650">
-                            <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
-                                           Size="Size.Small" Color="@Color.Error"/>
-                    </MudTooltip>
-                    </div>
-                }
-            </EditTemplate>
-        </TemplateColumn>
-    </Columns>
-    
-</MudDataGrid>
+            }
+        </ToolBarContent>
 
-@if (_showChart)
-{
-    <MudPaper Class="pa-6" Elevation="0">
-        <TotalExpensesByCategoryChart Budget="@Budget" IsTableBelowChart="true"/>
-    </MudPaper>
-}
+        <Columns>
+            <PropertyColumn Property="x => x.Source" Required="false"/>
+            <PropertyColumn Property="x => x.Amount" Format="C">
+                <EditTemplate>
+                    <MudNumericField T="decimal" Value="context.Item.Amount" Min="0" Format="C"
+                                     ValueChanged="x => { context.Item.Amount = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); }"/>
+                </EditTemplate>
+            </PropertyColumn>
+            @if (!IsIncome)
+            {
+                <PropertyColumn Property="x => x.CategoryName" Title="@nameof(Category)">
+                    <CellTemplate>
+                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                            <div style="background-color: @context.Item.Category.Color; width: 1rem; height: 1rem;" class="rounded"></div>
+                            <span>@context.Item.Category.Name</span>
+                        </MudStack>
+                    </CellTemplate>
+                    <EditTemplate>
+                        <MudStack Row="true" AlignItems="AlignItems.Center">
+                            <div style="background-color: @context.Item.Category.Color; width: .875rem; height: .875rem;" class="rounded"></div>
+                            @* Modal must be false or else edit mode will be disabled when clicking on MudAutocomplete. *@
+                            <MudAutocomplete T="Category" Value="@context.Item.Category" Modal="false" MaxItems="null"
+                                             ValueChanged="x => { context.Item.Category = x; _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); }"
+                                             SearchFunc="@GetCategoriesAsync" ToStringFunc="x => x.Name"
+                                             SelectOnActivation="true" SelectValueOnTab="true" Required="true">
+                                <ItemTemplate Context="e">
+                                    <MudText Class="mud-data-grid-edit-onclick" Style="font-size: .875rem;">@e.Name</MudText>
+                                </ItemTemplate>
+                            </MudAutocomplete>
+                        </MudStack>
+                    </EditTemplate>
+                </PropertyColumn>
+            }
+            <PropertyColumn Property="x => x.Date" Format="MMM. d">
+                <EditTemplate>
+                    <MudNumericField T="int?" Min="1" Value="context.Item.Date?.Day"
+                                     ValueChanged="x => { try { context.Item.Date = x is null ? null : new DateTime(Year, Month, x.Value); _gridRef!.CommittedItemChanges.InvokeAsync(context.Item); }catch (ArgumentOutOfRangeException) { context.Item.Date = new DateTime(Year, Month, DateTime.DaysInMonth(Year, Month)); } }"/>
+                </EditTemplate>
+            </PropertyColumn>
+            <TemplateColumn>
+                <EditTemplate>
+                    @if (IsIncome)
+                    {
+                        <div tabindex="-1">
+                            <MudTooltip Text="Delete Income" Delay="650">
+                                <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                               Size="Size.Small" Color="@Color.Error"/>
+                            </MudTooltip>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div tabindex="-1">
+                            <MudTooltip Text="Delete Expense" Delay="650">
+                                <MudIconButton OnClick="@(() => DeleteTransaction(context.Item))" Icon="@Icons.Material.Rounded.Delete"
+                                               Size="Size.Small" Color="@Color.Error"/>
+                            </MudTooltip>
+                        </div>
+                    }
+                </EditTemplate>
+            </TemplateColumn>
+        </Columns>
+
+    </MudDataGrid>
+
+    @if (_showChart)
+    {
+        <MudPaper Class="pa-6" Elevation="0">
+            <TotalExpensesByCategoryChart Budget="@Budget" IsTableBelowChart="true"/>
+        </MudPaper>
+    }
 </MudStack>
+
+<style>    
+    .income-grid {
+        max-height: fit-content;
+        background-color: var(--mud-palette-success-hover);
+    }    
+    
+    .expenses-grid {
+        max-height: fit-content;
+        background-color: var(--mud-palette-error-hover);
+    }
+    
+    .incomplete-income-row {
+        background-color: rgba(99, 187, 102, 0.2);
+    }
+        .incomplete-income-row:hover {
+            background-color: color-mix(in srgb, rgba(99, 187, 102, 0.2) 96%, black 4%) !important;
+        }
+        
+    .incomplete-expense-row {
+        background-color: rgba(246, 96, 85, 0.2);
+    }
+        .incomplete-expense-row:hover {
+            background-color: color-mix(in srgb, rgba(246, 96, 85, 0.2) 96%, black 4%) !important;
+        }
+</style>
 
 @code {
     /// <summary>Indicates whether the transactions are income or expenses.</summary>
@@ -173,16 +180,16 @@
     {
         // Used for toggling edit.
         await InvokeJSFunctionWithCallbackAsync(
-            this, 
-            "executeCallbackOnEditMudDataGridOutsideClick", 
+            this,
+            "executeCallbackOnEditMudDataGridOutsideClick",
             nameof(DisableEditAsync));
 
         // Used for adding new records on enter.
         await InvokeJSFunctionWithCallbackAsync(
-            this, 
-            "executeCallbackOnEditMudDataGridEnter", 
+            this,
+            "executeCallbackOnEditMudDataGridEnter",
             nameof(AddTransactionAsync));
-        
+
         _categories = (await CategoriesRepository.ReadAsync()).OrderBy(x => x.Name).ToList();
     }
 
@@ -249,6 +256,20 @@
         await Task.Delay(100);
         await ScrollManager.ScrollIntoViewAsync("table tbody tr:last-child", ScrollBehavior.Smooth);
     }
+    
+    private string ApplyRowClass(Transaction transaction, int index)
+    {
+        if (IsIncome)
+        {
+            if (transaction.Amount is 0) return "incomplete-income-row";
+        }
+        else
+        {
+            if (transaction.Amount is 0 || transaction.Date is null) return "incomplete-expense-row"; 
+        }
+
+        return string.Empty;
+    }
 
     /// <summary>
     /// Edit is disabled by clicking somewhere outside the grid.
@@ -266,7 +287,7 @@
             await OnDisableEdit.InvokeAsync();
         }
     }
-
+    
     /// <remarks>
     /// Disabling edit on dispose ensures that editing is gracefully disabled if the user navigates 
     /// to a different page or anything else that causes the component to be disposed.
