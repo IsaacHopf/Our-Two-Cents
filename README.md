@@ -13,8 +13,8 @@
 
 ## 📸 Screenshots
 ![Budgets](assets/budgets.png)
-![Budget - Income](assets/budget-income.PNG)
-![Analytics](assets/analytics.PNG)
+![Budget - Income](assets/budget-income.png)
+![Analytics](assets/analytics.png)
 *Find more screenshots in /assets*
 
 ## 🧰 Tech Stack
