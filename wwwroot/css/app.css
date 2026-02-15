@@ -51,6 +51,10 @@ th {
     .mud-tabs-scrollable-content .mud-tabs-panels {
         overflow-y: hidden;
     }
+
+    .mud-tabs-scrollable-content .mud-tab-panel {
+        height: 100%;
+    }
     
     .mud-tabs-scrollable-content .mud-table {
         display: flex;

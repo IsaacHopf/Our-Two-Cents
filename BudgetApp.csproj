@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<!-- Doesn't actually mean Windows Exe, 'Exe' = console entrypoint, 'WinExe' = application entry point -->
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ApplicationIcon>favicon.ico</ApplicationIcon>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -17,12 +17,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazor-ApexCharts" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.52.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.6" />
-		<PackageReference Include="MudBlazor" Version="8.9.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Photino.Blazor" Version="3.2.0" />
+		<PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
+		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.57.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.3" />
+		<PackageReference Include="MudBlazor" Version="8.15.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Photino.Blazor" Version="4.0.13" />
 		<PackageReference Include="Photino.Native" Version="4.0.22" />
 	</ItemGroup>
 
